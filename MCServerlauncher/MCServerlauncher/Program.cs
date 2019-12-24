@@ -89,11 +89,14 @@ namespace MCServerLauncher
         }
         static void start_server()
         {
+            
 
             CheckServerF();
 
             Console.Write("Server Version: ");
             var str = Console.ReadLine();
+
+        _beginnig:
             if (Directory.Exists("Servers/" + str))
             {
                 launch(str);
@@ -127,6 +130,11 @@ namespace MCServerLauncher
                 File.Delete("version_manifest.json");
                 JObject o = JObject.Parse(s);
 
+                if (str == "latest")
+                {
+                    str = o["latest"]["release"].ToString();
+                    goto _beginnig;
+                }
                 // Parse thru all the version 'till we find the correct one (if we do)
                 foreach (JToken token in o["versions"])
                 {
