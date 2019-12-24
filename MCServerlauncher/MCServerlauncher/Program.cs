@@ -24,15 +24,7 @@ namespace MCServerLauncher
         }
         static void Main(string[] args)
         {
-            /*
-            string[] jars = Directory.GetFiles("./", "*.jar");
-            for (int i = 0; i < jars.Length; i++)
-                Console.WriteLine(i + ") " + jars[i].Substring(2));
 
-            string str = Console.ReadLine();
-            Console.Clear();
-
-            */
 
             Console.Write("Server Version: ");
             var str = Console.ReadLine();
@@ -45,22 +37,21 @@ namespace MCServerLauncher
             {
 
 
-                /*
-                Console.Write("Parsing sv_list.json...");
-                string s = File.ReadAllText("sv_list.json");
-                */
-                bool bFoundVersion = false; // Found Version check
-                bool bFoundServer = false;
-                var client = new WebClient();
 
+                bool bFoundVersion = false; // Found Version check
+                bool bFoundServer = false;  // Found Server check
+                var client = new WebClient(); // For downloading the json files
+
+
+                // Start off by grabbing the version list.
                 client.DownloadFile("https://launchermeta.mojang.com/mc/game/version_manifest.json", "version_manifest.json");
 
-
+                // Read all the text then dispose of the file, we won't be needing it later.
                 string s = File.ReadAllText("version_manifest.json");
                 File.Delete("version_manifest.json");
                 JObject o = JObject.Parse(s);
 
-
+                // Parse thru all the version 'till we find the correct one (if we do)
                 foreach (JToken token in o["versions"])
                 {
                     if (token["id"].ToString() == str)
@@ -70,7 +61,11 @@ namespace MCServerLauncher
                         client.DownloadFile(token["url"].ToString(), str + ".json");
                     }
                 }
+
+
                 JToken tServer = null;
+
+                // If we found a valid version download the .json file for it, else just tell the user that they have small brain.
                 if (bFoundVersion)
                 {
                     s = File.ReadAllText(str + ".json");
@@ -89,6 +84,12 @@ namespace MCServerLauncher
                     Environment.Exit(2);
                 }
 
+
+                // Final steps.
+                // Make a folder for the version
+                // Copy the elua.txt and server.properties file into the folder
+                // Download the client.jar file and move it into the folder
+                // and then finally launch the server!
                 if (bFoundServer)
                 {
 
@@ -110,15 +111,17 @@ namespace MCServerLauncher
 
                     /* Clean up */
 
-
-
                     launch(str);
                 }
                 else
                 {
+                    // oop.
                     Console.WriteLine("Found version, but couldn't find available server.");
                 }
             }
         }
     }
 }
+
+
+// subscribe to jacksfilms on YTYouTube
