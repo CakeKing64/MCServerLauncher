@@ -60,7 +60,6 @@ namespace MCServerLauncher
                 File.Delete("version_manifest.json");
                 JObject o = JObject.Parse(s);
 
-                
                 // Parse thru all the version 'till we find the correct one (if we do)
                 foreach (JToken token in o["versions"])
                 {
