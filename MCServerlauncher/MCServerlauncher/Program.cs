@@ -16,15 +16,16 @@ namespace MCServerLauncher
 
         static void launch(string vnumb)
         {
-            Directory.SetCurrentDirectory(vnumb);
+            Directory.SetCurrentDirectory("Servers/" + vnumb);
             ProcessStartInfo a = new ProcessStartInfo("java", "-Xmx1024M -Xms1024M -jar server.jar nogui");
 
             System.Diagnostics.Process.Start(a);
+            Directory.SetCurrentDirectory("../../");
 
         }
         static void Main(string[] args)
         {
-            Console.Title = "MCServerLauncher 1.0 :)";
+            Console.Title = "MCServerLauncher 1.0";
             while (true)
             {
                 Console.WriteLine("1) Download / Launch Server\n2) Modify Properties\n3) Exit");
@@ -53,26 +54,39 @@ namespace MCServerLauncher
 
         }
 
+        static void CheckServerF()
+        {
+            if (!Directory.Exists("Servers"))
+                Directory.CreateDirectory("Servers");
+        }
+
         static void modify_prop()
         {
             Console.Write("Server Version: ");
             var str = Console.ReadLine();
-            if (Directory.Exists(str))
+
+            CheckServerF();
+
+
+            if (Directory.Exists("Servers/" + str))
             {
-                var process = System.Diagnostics.Process.Start("notepad", str + "/server.properties");
+                var process = System.Diagnostics.Process.Start("notepad", "Servers/" + str + "/server.properties");
                 process.WaitForExit();
             } else
             {
-                Console.WriteLine("Couldn't find version!\n");
+                Console.WriteLine("Couldn't find version!\nPress any button to continue");
+                Console.ReadKey();
             }
 
         }
         static void start_server()
         {
 
+            CheckServerF();
+
             Console.Write("Server Version: ");
             var str = Console.ReadLine();
-            if (Directory.Exists(str))
+            if (Directory.Exists("Servers/" + str))
             {
                 launch(str);
 
@@ -134,9 +148,9 @@ namespace MCServerLauncher
                 }
                 else
                 {
-                    Console.WriteLine("Couldn't find version " + str + ", quitting...");
-                    System.Threading.Thread.Sleep(3000); // Wait 3 secs
-                    Environment.Exit(-1);
+                    Console.WriteLine("Couldn't find version " + str + "\nPress any button to return to continue");
+                    Console.ReadKey();
+                    return;
                 }
 
 
@@ -148,9 +162,9 @@ namespace MCServerLauncher
                 if (bFoundServer)
                 {
 
-                    Directory.CreateDirectory(str);
-                    File.Copy("eula.txt", str + "/eula.txt");
-                    File.Copy("server.properties", str + "/server.properties");
+                    Directory.CreateDirectory("Servers/" + str);
+                    File.Copy("eula.txt", "Servers/" + str + "/eula.txt");
+                    File.Copy("server.properties", "Servers/" + str + "/server.properties");
 
                     string check = tServer["url"].ToString();
 
@@ -161,13 +175,13 @@ namespace MCServerLauncher
                         client.OpenRead(check);
                         Int64 bytes_total = Convert.ToInt64(client.ResponseHeaders["Content-Length"]);
                         Console.Write("(" + (bytes_total / 1000000) + " MB)...");
-                        client.DownloadFile(check, str + "/server.jar");
+                        client.DownloadFile(check, "Servers/" +  str + "/server.jar");
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("Failed to download server.jar, quitting...");
-                        System.Threading.Thread.Sleep(3000); // Wait 3 secs
-                        Environment.Exit(-1);
+                        Console.WriteLine("Failed to download server.jar\nPress any button to continue.");
+                        Console.ReadKey();
+                        return;
                     }
 
                     Console.Write("DONE!");
