@@ -109,7 +109,7 @@ namespace MCServerLauncher
 
 
 
-                    /* Clean up */
+            
 
                     launch(str);
                 }
