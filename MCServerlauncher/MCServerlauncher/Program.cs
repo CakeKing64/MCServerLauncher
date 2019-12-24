@@ -24,7 +24,51 @@ namespace MCServerLauncher
         }
         static void Main(string[] args)
         {
+            Console.Title = "MCServerLauncher :)";
+            while (true)
+            {
+                Console.WriteLine("1) Download / Launch Server\n2) Modify Properties\n3) Exit");
+                var sel = Console.ReadKey();
+                Console.Clear();
+                switch(sel.KeyChar)
+                {
+                    case '1':
+                        start_server();
+                        break;
+                    case '2':
+                        modify_prop();
+                        break;
+                    case '3':
+                        Environment.Exit(1);
+                        break;
+                    default:
+                        break;
+                }
 
+
+
+                Console.Clear();
+
+            }
+
+        }
+
+        static void modify_prop()
+        {
+            Console.Write("Server Version: ");
+            var str = Console.ReadLine();
+            if (Directory.Exists(str))
+            {
+                var process = System.Diagnostics.Process.Start("notepad", str + "/server.properties");
+                process.WaitForExit();
+            } else
+            {
+                Console.WriteLine("Couldn't find version!\n");
+            }
+
+        }
+        static void start_server()
+        {
 
             Console.Write("Server Version: ");
             var str = Console.ReadLine();
@@ -47,14 +91,15 @@ namespace MCServerLauncher
                 try
                 {
                     client.DownloadFile("https://launchermeta.mojang.com/mc/game/version_manifest.json", "version_manifest.json");
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     Console.WriteLine("Failed to download version list, quitting...");
                     System.Threading.Thread.Sleep(3000); // Wait 3 secs
                     Environment.Exit(-1);
                 }
 
-                
+
                 // Read all the text then dispose of the file, we won't be needing it later.
                 string s = File.ReadAllText("version_manifest.json");
                 File.Delete("version_manifest.json");
@@ -129,9 +174,10 @@ namespace MCServerLauncher
 
 
 
-            
+
 
                     launch(str);
+                    
                 }
                 else
                 {
