@@ -28,7 +28,7 @@ namespace MCServerLauncher
             Console.Title = "MCServerLauncher 1.0";
             while (true)
             {
-                Console.WriteLine("1) Download / Launch Server\n2) Modify Properties\n3) Exit");
+                Console.WriteLine("1) Download / Launch Server\n2) Modify Properties\n3) List Versions\n4) Exit");
                 var sel = Console.ReadKey();
                 Console.Clear();
                 switch(sel.KeyChar)
@@ -40,6 +40,14 @@ namespace MCServerLauncher
                         modify_prop();
                         break;
                     case '3':
+                        var saDirs = Directory.GetDirectories("Servers");
+                        Console.WriteLine("Avalable Server Versions:");
+                        foreach (string sDir in saDirs)
+                            Console.WriteLine(sDir.Substring(8));
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey();
+                        break;
+                    case '4':
                         Environment.Exit(1);
                         break;
                     default:
