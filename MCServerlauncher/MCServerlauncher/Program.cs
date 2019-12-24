@@ -14,6 +14,15 @@ namespace MCServerLauncher
     class Program
     {
 
+
+        static string GetLatest()
+        {
+            if (File.Exists("Servers/latest.txt"))
+                return File.ReadAllText("Servers/latest.txt");
+            else
+                return "N/A";
+        }
+
         static void launch(string vnumb)
         {
             Directory.SetCurrentDirectory("Servers/" + vnumb);
@@ -73,6 +82,9 @@ namespace MCServerLauncher
             Console.Write("Server Version: ");
             var str = Console.ReadLine();
 
+            if (str == "latest")
+                str = GetLatest();
+
             CheckServerF();
 
 
@@ -89,12 +101,17 @@ namespace MCServerLauncher
         }
         static void start_server()
         {
-            
+            bool bFoundVersion = false; // Found Version check
+            bool bFoundServer = false;  // Found Server check
+            var client = new WebClient(); // For downloading the json files
 
+
+           
             CheckServerF();
 
             Console.Write("Server Version: ");
             var str = Console.ReadLine();
+
 
         _beginnig:
             if (Directory.Exists("Servers/" + str))
@@ -107,11 +124,6 @@ namespace MCServerLauncher
 
 
 
-                bool bFoundVersion = false; // Found Version check
-                bool bFoundServer = false;  // Found Server check
-                var client = new WebClient(); // For downloading the json files
-
-
                 // Start off by grabbing the version list.
                 try
                 {
@@ -119,9 +131,20 @@ namespace MCServerLauncher
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("Failed to download version list, quitting...");
-                    System.Threading.Thread.Sleep(3000); // Wait 3 secs
-                    Environment.Exit(-1);
+                    if (str != "latest")
+                    {
+                        Console.WriteLine("Failed to download version list, quitting...");
+                        System.Threading.Thread.Sleep(3000); // Wait 3 secs
+                        Environment.Exit(-1);
+                    }
+                    else
+                    {
+                        if (File.Exists("Servers/latest.txt"))
+                        {
+                            str = File.ReadAllText("latest.txt");
+                                goto _beginnig;
+                        }
+                    }
                 }
 
 
@@ -133,6 +156,7 @@ namespace MCServerLauncher
                 if (str == "latest")
                 {
                     str = o["latest"]["release"].ToString();
+                    File.WriteAllText("Servers/latest.txt", str, Encoding.ASCII);
                     goto _beginnig;
                 }
                 // Parse thru all the version 'till we find the correct one (if we do)
