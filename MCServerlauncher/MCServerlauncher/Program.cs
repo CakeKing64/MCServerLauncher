@@ -34,6 +34,13 @@ namespace MCServerLauncher
         }
         static void Main(string[] args)
         {
+            if(!File.Exists("settings.json"))
+            {
+                var job = new JObject();
+                job["bUseSingleDirectory"] = "true";
+                File.WriteAllText("settings.json", job.ToString());
+            }
+
             Console.Title = "MCServerLauncher 1.0";
             while (true)
             {
