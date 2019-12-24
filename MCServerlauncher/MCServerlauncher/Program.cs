@@ -44,8 +44,17 @@ namespace MCServerLauncher
 
 
                 // Start off by grabbing the version list.
-                client.DownloadFile("https://launchermeta.mojang.com/mc/game/version_manifest.json", "version_manifest.json");
+                try
+                {
+                    client.DownloadFile("https://launchermeta.mojang.com/mc/game/version_manifest.json", "version_manifest.json");
+                } catch (Exception e)
+                {
+                    Console.WriteLine("Failed to download version list, quitting...");
+                    System.Threading.Thread.Sleep(3000); // Wait 3 secs
+                    Environment.Exit(-1);
+                }
 
+                
                 // Read all the text then dispose of the file, we won't be needing it later.
                 string s = File.ReadAllText("version_manifest.json");
                 File.Delete("version_manifest.json");
@@ -80,8 +89,9 @@ namespace MCServerLauncher
                 }
                 else
                 {
-                    Console.WriteLine("Couldn't find version " + str);
-                    Environment.Exit(2);
+                    Console.WriteLine("Couldn't find version " + str + ", quitting...");
+                    System.Threading.Thread.Sleep(3000); // Wait 3 secs
+                    Environment.Exit(-1);
                 }
 
 
@@ -101,10 +111,20 @@ namespace MCServerLauncher
 
                     Console.Write("Downloading server.jar ");
 
-                    client.OpenRead(check);
-                    Int64 bytes_total = Convert.ToInt64(client.ResponseHeaders["Content-Length"]);
-                    Console.Write("(" + (bytes_total / 1000000) + " MB)...");
-                    client.DownloadFile(check, str + "/server.jar");
+                    try
+                    {
+                        client.OpenRead(check);
+                        Int64 bytes_total = Convert.ToInt64(client.ResponseHeaders["Content-Length"]);
+                        Console.Write("(" + (bytes_total / 1000000) + " MB)...");
+                        client.DownloadFile(check, str + "/server.jar");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Failed to download server.jar, quitting...");
+                        System.Threading.Thread.Sleep(3000); // Wait 3 secs
+                        Environment.Exit(-1);
+                    }
+
                     Console.Write("DONE!");
 
 
