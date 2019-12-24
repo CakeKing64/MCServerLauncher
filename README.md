@@ -1,3 +1,3 @@
 # MCServerLauncher
 
-very cool program, please rate 5 stars on happy wheels
+Allows for an easy way to create Vanilla (for now) servers
