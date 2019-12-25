@@ -14,13 +14,18 @@ namespace MCServerLauncher
     class Program
     {
 
+        // Settings
+        static bool bUseSingleDirectory = false;
+        static string sLatestVersion = "1.0";
+
+
+
+
+
 
         static string GetLatest()
         {
-            if (File.Exists("Servers/latest.txt"))
-                return File.ReadAllText("Servers/latest.txt");
-            else
-                return "N/A";
+            return sLatestVersion;
         }
 
         static void launch(string vnumb)
@@ -32,15 +37,33 @@ namespace MCServerLauncher
             Directory.SetCurrentDirectory("../../");
 
         }
+
+        static void ProgramExit(object sender, EventArgs ea)
+        {
+            JObject job = new JObject();
+            job["bUseSingleDirectory"] = bUseSingleDirectory;
+            job["sLatestVersion"] = sLatestVersion;
+            File.WriteAllText("settings.json", job.ToString());
+        }
         static void Main(string[] args)
         {
+
+            AppDomain.CurrentDomain.ProcessExit += new EventHandler(ProgramExit);
+
+
             if(!File.Exists("settings.json"))
             {
                 var job = new JObject();
-                job["bUseSingleDirectory"] = "true";
+                job["bUseSingleDirectory"] = false;
+                job["sLatestVersion"] = "1.0";
                 File.WriteAllText("settings.json", job.ToString());
+            } else
+            {
+                var job = JObject.Parse(File.ReadAllText("settings.json"));
+                sLatestVersion = job["sLatestVersion"]!=null? job["sLatestVersion"].ToString():"1.0";
+                bUseSingleDirectory = job["bUseSingleDirectory"]!=null?bool.Parse(job["bUseSingleDirectory"].ToString()):false;
             }
-
+           
             Console.Title = "MCServerLauncher 1.0";
             while (true)
             {
@@ -59,7 +82,10 @@ namespace MCServerLauncher
                         var saDirs = Directory.GetDirectories("Servers");
                         Console.WriteLine("Avalable Server Versions:");
                         foreach (string sDir in saDirs)
-                            Console.WriteLine(sDir.Substring(8));
+                        {
+                            var str = sDir.Substring(8);
+                            Console.WriteLine(str + (str==sLatestVersion?" (Latest)":""));
+                        }
                         Console.WriteLine("Press any key to continue...");
                         Console.ReadKey();
                         break;
@@ -111,16 +137,16 @@ namespace MCServerLauncher
             bool bFoundVersion = false; // Found Version check
             bool bFoundServer = false;  // Found Server check
             var client = new WebClient(); // For downloading the json files
-
+            var bUseLatest = false;
 
            
             CheckServerF();
 
             Console.Write("Server Version: ");
             var str = Console.ReadLine();
+        _beginning:
 
-
-        _beginnig:
+            bUseLatest = str == "latest";
             if (Directory.Exists("Servers/" + str))
             {
                 launch(str);
@@ -128,8 +154,6 @@ namespace MCServerLauncher
             }
             else
             {
-
-
 
                 // Start off by grabbing the version list.
                 try
@@ -143,14 +167,10 @@ namespace MCServerLauncher
                         Console.WriteLine("Failed to download version list, quitting...");
                         System.Threading.Thread.Sleep(3000); // Wait 3 secs
                         Environment.Exit(-1);
-                    }
-                    else
+                    } else
                     {
-                        if (File.Exists("Servers/latest.txt"))
-                        {
-                            str = File.ReadAllText("latest.txt");
-                                goto _beginnig;
-                        }
+                      str = sLatestVersion;
+                        goto _beginning;
                     }
                 }
 
@@ -160,11 +180,11 @@ namespace MCServerLauncher
                 File.Delete("version_manifest.json");
                 JObject o = JObject.Parse(s);
 
-                if (str == "latest")
+                if (bUseLatest)
                 {
                     str = o["latest"]["release"].ToString();
-                    File.WriteAllText("Servers/latest.txt", str, Encoding.ASCII);
-                    goto _beginnig;
+                    sLatestVersion = str;
+                    goto _beginning;
                 }
                 // Parse thru all the version 'till we find the correct one (if we do)
                 foreach (JToken token in o["versions"])
