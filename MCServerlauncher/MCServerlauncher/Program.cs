@@ -310,7 +310,7 @@ namespace MCServerLauncher
             ServerVars["function-permission-level"] = "4";
             ServerVars["gamemode"] = "0";
             ServerVars["generate-structures"] = "true";
-            ServerVars["ggenerator-settings"] = "";
+            ServerVars["generator-settings"] = "";
             ServerVars["hardcore"] = "false";
             ServerVars["level-name"] = "world";
             ServerVars["level-seed"] = "";
