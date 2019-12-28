@@ -359,10 +359,6 @@ namespace MCServerLauncher
 
             return spProp;
         }
-        private string BLower(bool b)
-        {
-            return b.ToString().ToLower();
-        }
         public override string ToString()
         {
 
