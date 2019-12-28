@@ -8,6 +8,7 @@ using System.Diagnostics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using System.Windows;
 
 namespace MCServerLauncher
 {
@@ -17,8 +18,8 @@ namespace MCServerLauncher
         // Settings
         static bool bUseSingleDirectory = false;
         static string sLatestVersion = "1.0";
-
-
+        static bool bReadEULA = false;
+        static string sLaunchArgs = "-Xmx1024M -Xms1024M -jar server.jar nogui";
 
 
 
@@ -31,7 +32,7 @@ namespace MCServerLauncher
         static void launch(string vnumb)
         {
             Directory.SetCurrentDirectory("Servers/" + vnumb);
-            ProcessStartInfo a = new ProcessStartInfo("java", "-Xmx1024M -Xms1024M -jar server.jar nogui");
+            ProcessStartInfo a = new ProcessStartInfo("java", sLaunchArgs);
 
             System.Diagnostics.Process.Start(a);
             Directory.SetCurrentDirectory("../../");
@@ -43,6 +44,8 @@ namespace MCServerLauncher
             JObject job = new JObject();
             job["bUseSingleDirectory"] = bUseSingleDirectory;
             job["sLatestVersion"] = sLatestVersion;
+            job["bReadEULA"] = bReadEULA;
+            job["sLaunchArgs"] = sLaunchArgs;
             File.WriteAllText("settings.json", job.ToString());
         }
         static void Main(string[] args)
@@ -51,26 +54,46 @@ namespace MCServerLauncher
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(ProgramExit);
 
 
-            if(!File.Exists("settings.json"))
+            if (!File.Exists("settings.json"))
             {
                 var job = new JObject();
                 job["bUseSingleDirectory"] = false;
                 job["sLatestVersion"] = "1.0";
+                job["bReadEULA"] = false;
+                job["sLaunchArgs"] = "-Xmx1024M -Xms1024M -jar server.jar nogui";
                 File.WriteAllText("settings.json", job.ToString());
             } else
             {
                 var job = JObject.Parse(File.ReadAllText("settings.json"));
-                sLatestVersion = job["sLatestVersion"]!=null? job["sLatestVersion"].ToString():"1.0";
-                bUseSingleDirectory = job["bUseSingleDirectory"]!=null?bool.Parse(job["bUseSingleDirectory"].ToString()):false;
+                sLatestVersion = job["sLatestVersion"] != null ? job["sLatestVersion"].ToString() : "1.0";
+                bUseSingleDirectory = job["bUseSingleDirectory"] != null ? bool.Parse(job["bUseSingleDirectory"].ToString()) : false;
+                bReadEULA = job["bReadEULA"] != null ? bool.Parse(job["bReadEULA"].ToString()) : false;
+                sLatestVersion = job["sLaunchArgs"] != null ? job["sLaunchArgs"].ToString() : sLaunchArgs;
             }
-           
+
+            // imma just put this in here so i don't feel bad/what ever
+            MessageBoxResult mbrResult = MessageBoxResult.No;
+
+
+            if (!bReadEULA)
+            {
+                mbrResult = MessageBox.Show("Please read the Minecraft EULA before continuing: https://account.mojang.com/documents/minecraft_eula\nHit a button to continue", "Read before continuing (Or not, you probably won't)", MessageBoxButton.YesNo);
+
+                if (mbrResult == MessageBoxResult.Yes)
+                    bReadEULA = true;
+                else
+                {
+                    Environment.Exit(0);
+                }
+            }
+
             Console.Title = "MCServerLauncher 1.0";
             while (true)
             {
                 Console.WriteLine("1) Download / Launch Server\n2) Modify Properties\n3) List Versions\n4) Exit");
                 var sel = Console.ReadKey();
                 Console.Clear();
-                switch(sel.KeyChar)
+                switch (sel.KeyChar)
                 {
                     case '1':
                         start_server();
@@ -84,7 +107,7 @@ namespace MCServerLauncher
                         foreach (string sDir in saDirs)
                         {
                             var str = sDir.Substring(8);
-                            Console.WriteLine(str + (str==sLatestVersion?" (Latest)":""));
+                            Console.WriteLine(str + (str == sLatestVersion ? " (Latest)" : ""));
                         }
                         Console.WriteLine("Press any key to continue...");
                         Console.ReadKey();
@@ -139,7 +162,7 @@ namespace MCServerLauncher
             var client = new WebClient(); // For downloading the json files
             var bUseLatest = false;
 
-           
+
             CheckServerF();
 
             Console.Write("Server Version: ");
@@ -169,7 +192,7 @@ namespace MCServerLauncher
                         Environment.Exit(-1);
                     } else
                     {
-                      str = sLatestVersion;
+                        str = sLatestVersion;
                         goto _beginning;
                     }
                 }
@@ -230,8 +253,8 @@ namespace MCServerLauncher
                 {
 
                     Directory.CreateDirectory("Servers/" + str);
-                    File.Copy("eula.txt", "Servers/" + str + "/eula.txt");
-                    File.Copy("server.properties", "Servers/" + str + "/server.properties");
+                    File.WriteAllText("Servers/" + str + "/eula.txt", "eula = " + bReadEULA.ToString());
+                    File.WriteAllText("Servers/" + str + "/server.properties", new ServerProperties().ToString());
 
                     string check = tServer["url"].ToString();
 
@@ -242,7 +265,7 @@ namespace MCServerLauncher
                         client.OpenRead(check);
                         Int64 bytes_total = Convert.ToInt64(client.ResponseHeaders["Content-Length"]);
                         Console.Write("(" + (bytes_total / 1000000) + " MB)...");
-                        client.DownloadFile(check, "Servers/" +  str + "/server.jar");
+                        client.DownloadFile(check, "Servers/" + str + "/server.jar");
                     }
                     catch
                     {
@@ -258,7 +281,7 @@ namespace MCServerLauncher
 
 
                     launch(str);
-                    
+
                 }
                 else
                 {
@@ -266,6 +289,90 @@ namespace MCServerLauncher
                     Console.WriteLine("Found version, but couldn't find available server.");
                 }
             }
+        }
+    }
+
+
+    class ServerProperties
+    {
+        public Dictionary<string, string> ServerVars = new Dictionary<string, string>();
+
+
+        public ServerProperties()
+        {
+            ServerVars["allow-flight"] = "false";
+            ServerVars["allow-nether"] = "true";
+            ServerVars["difficulty"] = "0";
+            ServerVars["enable-command-block"] = "false";
+            ServerVars["enable-query"] = "false";
+            ServerVars["enable-rcon"] = "false";
+            ServerVars["force-gamemode"] = "false";
+            ServerVars["function-permission-level"] = "4";
+            ServerVars["gamemode"] = "0";
+            ServerVars["generate-structures"] = "true";
+            ServerVars["ggenerator-settings"] = "";
+            ServerVars["hardcore"] = "false";
+            ServerVars["level-name"] = "world";
+            ServerVars["level-seed"] = "";
+            ServerVars["level-type"] = "default";
+            ServerVars["max-build-height"] = "256";
+            ServerVars["max-players"] = "20";
+            ServerVars["max-tick-time"] = "60000";
+            ServerVars["max-world-size"] = "29999984";
+            ServerVars["motd"] = "A Minecraft Server";
+            ServerVars["network-compression-threshold"] = "256";
+            ServerVars["online-mode"] = "true";
+            ServerVars["op-permission-level"] = "4";
+            ServerVars["player-idle-timeout"] = "0";
+            ServerVars["prevent-proxy-connections"] = "false";
+            ServerVars["pvp"] = "true";
+            ServerVars["query.port"] = "25565";
+            ServerVars["query.password"] = "25575";
+            ServerVars["resource-pack"] = "";
+            ServerVars["resource-pack-sha1"] = "";
+            ServerVars["server-ip"] = "";
+            ServerVars["server-port"] = "25565";
+            ServerVars["snooper-enabled"] = "true";
+            ServerVars["spawn-animals"] = "true";
+            ServerVars["spawn-monsters"] = "true";
+            ServerVars["spawn-npcs"] = "true";
+            ServerVars["spawn-protection"] = "16";
+            ServerVars["use-native-transport"] = "true";
+            ServerVars["view-distance"] = "10";
+            ServerVars["white-list"] = "false";
+            ServerVars["enforce-whitelist"] = "false";
+        }
+
+        public static ServerProperties FromFile(string file)
+        {
+            var spProp = new ServerProperties();
+
+            string[] lines = File.ReadAllLines(file);
+            foreach(string line in lines)
+            {
+                if(line[0] != '#')
+                {
+                    var vs = line.Split('=');
+                    spProp.ServerVars[vs[0]] = vs[1];
+                }
+            }
+
+            return spProp;
+        }
+        private string BLower(bool b)
+        {
+            return b.ToString().ToLower();
+        }
+        public override string ToString()
+        {
+
+            var str = "";
+            foreach( KeyValuePair<string,string> KVP in ServerVars)
+            {
+                str+=KVP.Key + "=" + KVP.Value + "\n";
+            }
+
+            return str;
         }
     }
 }
