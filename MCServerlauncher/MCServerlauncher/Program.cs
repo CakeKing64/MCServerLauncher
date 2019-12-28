@@ -160,7 +160,7 @@ namespace MCServerLauncher
                 {
                     client.DownloadFile("https://launchermeta.mojang.com/mc/game/version_manifest.json", "version_manifest.json");
                 }
-                catch (Exception e)
+                catch
                 {
                     if (str != "latest")
                     {
@@ -244,7 +244,7 @@ namespace MCServerLauncher
                         Console.Write("(" + (bytes_total / 1000000) + " MB)...");
                         client.DownloadFile(check, "Servers/" +  str + "/server.jar");
                     }
-                    catch (Exception e)
+                    catch
                     {
                         Console.WriteLine("Failed to download server.jar\nPress any button to continue.");
                         Console.ReadKey();
