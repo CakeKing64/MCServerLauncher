@@ -29,13 +29,13 @@ namespace MCServerLauncher
             return sLatestVersion;
         }
 
-        static void launch(string vnumb)
+        static void launch(string stype, string vnumb)
         {
-            Directory.SetCurrentDirectory("Servers/" + vnumb);
+            Directory.SetCurrentDirectory("Servers/" + stype + "/" + vnumb);
             ProcessStartInfo a = new ProcessStartInfo("java", sLaunchArgs);
 
             System.Diagnostics.Process.Start(a);
-            Directory.SetCurrentDirectory("../../");
+            Directory.SetCurrentDirectory("../../../");
 
         }
 
@@ -46,6 +46,7 @@ namespace MCServerLauncher
             job["sLatestVersion"] = sLatestVersion;
             job["bReadEULA"] = bReadEULA;
             job["sLaunchArgs"] = sLaunchArgs;
+            job["bUseGUI"] = false;
             File.WriteAllText("settings.json", job.ToString());
         }
         static void Main(string[] args)
@@ -56,12 +57,7 @@ namespace MCServerLauncher
 
             if (!File.Exists("settings.json"))
             {
-                var job = new JObject();
-                job["bUseSingleDirectory"] = false;
-                job["sLatestVersion"] = "1.0";
-                job["bReadEULA"] = false;
-                job["sLaunchArgs"] = "-Xmx1024M -Xms1024M -jar server.jar nogui";
-                File.WriteAllText("settings.json", job.ToString());
+                ProgramExit(null, null);
             } else
             {
                 var job = JObject.Parse(File.ReadAllText("settings.json"));
@@ -96,17 +92,41 @@ namespace MCServerLauncher
                 switch (sel.KeyChar)
                 {
                     case '1':
-                        start_server();
+                        Console.WriteLine("1) Vanilla Server\n2) Spigot Server\nOther) Return");
+                        var sel2 = Console.ReadKey();
+                        Console.Clear();
+                        switch (sel2.KeyChar)
+                        {
+                            case '1':
+                                start_server_vanilla();
+                                break;
+                            case '2':
+                                start_server_spigot();
+                                break;
+                            default:
+                                break;
+                        }
+                       
                         break;
                     case '2':
                         modify_prop();
                         break;
                     case '3':
-                        var saDirs = Directory.GetDirectories("Servers");
-                        Console.WriteLine("Avalable Server Versions:");
+                        if (Directory.Exists("Servers")) Directory.CreateDirectory("Servers");
+                        if (Directory.Exists("Servers/Spigot")) Directory.CreateDirectory("Servers/Spigot");
+                        if (Directory.Exists("Servers/Vanilla")) Directory.CreateDirectory("Servers/Vanilla");
+                        var saDirs = Directory.GetDirectories("Servers/Vanilla");
+                        Console.WriteLine("Avalable Server Versions:\nVanilla)");
                         foreach (string sDir in saDirs)
                         {
-                            var str = sDir.Substring(8);
+                            var str = sDir.Substring(16);
+                            Console.WriteLine(str + (str == sLatestVersion ? " (Latest)" : ""));
+                        }
+                        saDirs = Directory.GetDirectories("Servers/Spigot");
+                        Console.WriteLine("Spigot)");
+                        foreach (string sDir in saDirs)
+                        {
+                            var str = sDir.Substring(15);
                             Console.WriteLine(str + (str == sLatestVersion ? " (Latest)" : ""));
                         }
                         Console.WriteLine("Press any key to continue...");
@@ -131,8 +151,14 @@ namespace MCServerLauncher
         {
             if (!Directory.Exists("Servers"))
                 Directory.CreateDirectory("Servers");
+            if (!Directory.Exists("Servers/Vanilla"))
+                Directory.CreateDirectory("Servers/Vanilla");
         }
 
+        static string GetSDV()
+        {
+            return "Servers/Vanilla/";
+        }
         static void modify_prop()
         {
             Console.Write("Server Version: ");
@@ -155,7 +181,9 @@ namespace MCServerLauncher
             }
 
         }
-        static void start_server()
+
+    #region "Vanilla Server"
+        static void start_server_vanilla()
         {
             bool bFoundVersion = false; // Found Version check
             bool bFoundServer = false;  // Found Server check
@@ -170,9 +198,9 @@ namespace MCServerLauncher
         _beginning:
 
             bUseLatest = str == "latest";
-            if (Directory.Exists("Servers/" + str))
+            if (Directory.Exists(GetSDV() + str))
             {
-                launch(str);
+                launch("Vanilla",str);
 
             }
             else
@@ -252,9 +280,9 @@ namespace MCServerLauncher
                 if (bFoundServer)
                 {
 
-                    Directory.CreateDirectory("Servers/" + str);
-                    File.WriteAllText("Servers/" + str + "/eula.txt", "eula = " + bReadEULA.ToString());
-                    File.WriteAllText("Servers/" + str + "/server.properties", new ServerProperties().ToString());
+                    Directory.CreateDirectory(GetSDV() + str);
+                    File.WriteAllText(GetSDV() + str + "/eula.txt", "eula = " + bReadEULA.ToString());
+                    File.WriteAllText(GetSDV() + str + "/server.properties", new ServerProperties().ToString());
 
                     string check = tServer["url"].ToString();
 
@@ -265,7 +293,7 @@ namespace MCServerLauncher
                         client.OpenRead(check);
                         Int64 bytes_total = Convert.ToInt64(client.ResponseHeaders["Content-Length"]);
                         Console.Write("(" + (bytes_total / 1000000) + " MB)...");
-                        client.DownloadFile(check, "Servers/" + str + "/server.jar");
+                        client.DownloadFile(check, GetSDV() + str + "/server.jar");
                     }
                     catch
                     {
@@ -280,7 +308,7 @@ namespace MCServerLauncher
 
 
 
-                    launch(str);
+                    launch("Vanilla",str);
 
                 }
                 else
@@ -290,7 +318,57 @@ namespace MCServerLauncher
                 }
             }
         }
+        #endregion
+
+
+    #region "Spigot Server"
+        static void start_server_spigot()
+        {
+            var client = new WebClient(); // For downloading the json files
+
+            
+            // Download build tools first
+            if (!Directory.Exists("BuildTools"))
+            {
+                Directory.CreateDirectory("BuildTools");
+            }
+            if (!File.Exists("BuildTools/BuildTools.jar")) 
+            {
+                Console.WriteLine("Downloading BuildTools...");
+                client.DownloadFile("https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar", "BuildTools/BuildTools.jar");
+                Console.Clear();
+            }
+
+
+            Console.Write("Server Version: ");
+            string ver = Console.ReadLine();
+
+            if (!Directory.Exists("Servers/Spigot/" + ver))
+            {
+                Directory.SetCurrentDirectory("BuildTools");
+
+                ProcessStartInfo a = new ProcessStartInfo("java", "-jar BuildTools.jar --rev " + ver);
+                
+                Process prc = System.Diagnostics.Process.Start(a);
+                Console.WriteLine("Please wait for the download to complete...");
+                prc.WaitForExit();
+                Directory.SetCurrentDirectory("../");
+
+                if (!Directory.Exists("Servers/Spigot"))
+                    Directory.CreateDirectory("Servers/Spigot");
+
+                Directory.CreateDirectory("Servers/Spigot/" + ver);
+                File.Move("BuildTools/spigot-" + ver + ".jar", "Servers/Spigot/" + ver + "/server.jar");
+            }
+
+            File.WriteAllText("Servers/Spigot/" + ver + "/eula.txt", "eula=" + bReadEULA.ToString().ToLower());
+            File.WriteAllText("Servers/Spigot/" + ver + "/server.properties", new ServerProperties().ToString());
+            launch("Spigot", ver);
+        }
+    #endregion
     }
+
+
 
 
     class ServerProperties
