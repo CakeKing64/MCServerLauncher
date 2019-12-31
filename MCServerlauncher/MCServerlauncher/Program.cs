@@ -20,7 +20,8 @@ namespace MCServerLauncher
         static string sLatestVersion = "1.0";
         static bool bReadEULA = false;
         static string sLaunchArgs = "-Xmx1024M -Xms1024M -jar server.jar nogui";
-
+        static string sQLaunchSType = "Vanilla";
+        static string sQLaunchSVersion = "1.0";
 
 
 
@@ -31,6 +32,13 @@ namespace MCServerLauncher
 
         static void launch(string stype, string vnumb)
         {
+            if (!Directory.Exists("Servers/" + stype + "/"  + vnumb) || !File.Exists("Servers/" + stype + "/" + vnumb + "/server.jar"))
+            {
+                Console.WriteLine("Unable to launch " + stype + " / " + vnumb);
+                return;
+            }
+            sQLaunchSType = stype;
+            sQLaunchSVersion = vnumb;
             Directory.SetCurrentDirectory("Servers/" + stype + "/" + vnumb);
             ProcessStartInfo a = new ProcessStartInfo("java", sLaunchArgs);
 
@@ -47,6 +55,8 @@ namespace MCServerLauncher
             job["bReadEULA"] = bReadEULA;
             job["sLaunchArgs"] = sLaunchArgs;
             job["bUseGUI"] = false;
+            job["sQLaunchSType"] = sQLaunchSType;
+            job["sQLaunchSVersion"] = sQLaunchSVersion;
             File.WriteAllText("settings.json", job.ToString());
         }
         static void Main(string[] args)
@@ -86,7 +96,7 @@ namespace MCServerLauncher
             Console.Title = "MCServerLauncher 1.0";
             while (true)
             {
-                Console.WriteLine("1) Download / Launch Server\n2) Modify Properties\n3) List Versions\n4) Exit");
+                Console.WriteLine("1) Download / Launch Server\n2) Modify Properties (Broken)\n3) List Versions\n4) Quick Launch (" + sQLaunchSType + " / " + sQLaunchSVersion + ")\n5) Exit");
                 var sel = Console.ReadKey();
                 Console.Clear();
                 switch (sel.KeyChar)
@@ -133,6 +143,9 @@ namespace MCServerLauncher
                         Console.ReadKey();
                         break;
                     case '4':
+                        launch(sQLaunchSType, sQLaunchSVersion);
+                        break;
+                    case '5':
                         Environment.Exit(1);
                         break;
                     default:
@@ -343,7 +356,7 @@ namespace MCServerLauncher
             Console.Write("Server Version: ");
             string ver = Console.ReadLine();
 
-            if (!Directory.Exists("Servers/Spigot/" + ver))
+                if (!Directory.Exists("Servers/Spigot/" + ver) || !File.Exists("Servers/Spigot/" + ver + "/server.jar"))
             {
                 Directory.SetCurrentDirectory("BuildTools");
 
@@ -361,8 +374,8 @@ namespace MCServerLauncher
                 File.Move("BuildTools/spigot-" + ver + ".jar", "Servers/Spigot/" + ver + "/server.jar");
             }
 
-            File.WriteAllText("Servers/Spigot/" + ver + "/eula.txt", "eula=" + bReadEULA.ToString().ToLower());
-            File.WriteAllText("Servers/Spigot/" + ver + "/server.properties", new ServerProperties().ToString());
+            if(!File.Exists("Servers/Spigot/" + ver + "/eula.txt")) File.WriteAllText("Servers/Spigot/" + ver + "/eula.txt", "eula=" + bReadEULA.ToString().ToLower());
+            if (!File.Exists("Servers/Spigot/" + ver + "/server.properties")) File.WriteAllText("Servers/Spigot/" + ver + "/server.properties", new ServerProperties().ToString());
             launch("Spigot", ver);
         }
     #endregion
