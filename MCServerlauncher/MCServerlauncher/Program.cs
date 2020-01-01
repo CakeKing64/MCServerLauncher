@@ -285,8 +285,15 @@ namespace MCServerLauncher
             if (stype < '1' || stype > '2')
                 return;
             Console.Clear();
+            Console.SetCursorPosition(0, 1);
+            Console.Write("Type 'back' to return");
+            Console.SetCursorPosition(0, 0);
             Console.Write("Server Version: ");
+
+
             var str = Console.ReadLine();
+            if (str.ToLower() == "back")
+                return;
 
             if (str == "latest")
                 str = GetLatest();
@@ -296,12 +303,10 @@ namespace MCServerLauncher
             string sStypeString = (stype == '1' ? "Vanilla/" : "Spigot/");
             if (Directory.Exists("Servers/" + sStypeString + str))
             {
-                /*
-                var process = System.Diagnostics.Process.Start("notepad", "Servers/" + sStypeString + str + "/server.properties");
-                process.WaitForExit();
-                */
                 var pe = new PropertiesEditor("Servers/" + sStypeString + str);
+                pe.Text = "Properties Editor - " + (stype == '1' ? "Vanilla" : "Spigot") + " " + str; 
                 pe.ShowDialog();
+                pe.Dispose();
             } else
             {
                 Console.WriteLine("Couldn't find version!\nPress any button to continue");
@@ -573,7 +578,7 @@ namespace MCServerLauncher
             ServerVars["prevent-proxy-connections"] = new SPropSetting("false",2);
             ServerVars["pvp"] = new SPropSetting("true",2);
             ServerVars["query.port"] = new SPropSetting("25565",1);
-            ServerVars["query.password"] = new SPropSetting("25575",1);
+            ServerVars["query.password"] = new SPropSetting("",1);
             ServerVars["rcon.port"] = new SPropSetting("25575", 1);
             ServerVars["rcon.password"] = new SPropSetting("", 0);
             ServerVars["resource-pack"] = new SPropSetting("",0);

@@ -128,6 +128,31 @@ namespace MCServerLauncher
                 e.Cancel = prevent_close(); 
             }
 
+
+            int p = 0;
+            foreach (TextBox tb in keys)
+            {
+                var stype = sprop.ServerVars[tb.Text].type;
+
+                TextBox valtext = null;
+                CheckBox valcheck = null;
+                if (stype == 0 || stype == 1)
+                {
+                    valtext = (TextBox)values[p];
+                    valtext.Dispose();
+                }
+                else
+                {
+                    valcheck = (CheckBox)values[p];
+                    valcheck.Dispose();
+                }
+
+                p++;
+            }
+            
+            foreach (TextBox tb in keys)
+                tb.Dispose();
+
         }
 
         private void ItemChanged(object sender,EventArgs e)
