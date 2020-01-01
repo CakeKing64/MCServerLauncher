@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Windows;
+using System.Windows.Forms;
+using MessageBox = System.Windows.MessageBox;
 
 namespace MCServerLauncher
 {
@@ -22,7 +24,7 @@ namespace MCServerLauncher
         static string sLaunchArgs = "-Xmx1024M -Xms1024M -jar server.jar nogui";
         static string sQLaunchSType = "Vanilla";
         static string sQLaunchSVersion = "1.0";
-
+        static string sJavaPath = null;
 
 
         static string GetLatest()
@@ -39,8 +41,9 @@ namespace MCServerLauncher
             }
             sQLaunchSType = stype;
             sQLaunchSVersion = vnumb;
+            SaveSettings();
             Directory.SetCurrentDirectory("Servers/" + stype + "/" + vnumb);
-            ProcessStartInfo a = new ProcessStartInfo("java", sLaunchArgs);
+            ProcessStartInfo a = new ProcessStartInfo(sJavaPath + "bin/java", sLaunchArgs);
 
             System.Diagnostics.Process.Start(a);
             Directory.SetCurrentDirectory("../../../");
@@ -48,6 +51,10 @@ namespace MCServerLauncher
         }
 
         static void ProgramExit(object sender, EventArgs ea)
+        {
+            SaveSettings();
+        }
+        static void SaveSettings()
         {
             JObject job = new JObject();
             job["bUseSingleDirectory"] = bUseSingleDirectory;
@@ -57,8 +64,16 @@ namespace MCServerLauncher
             job["bUseGUI"] = false;
             job["sQLaunchSType"] = sQLaunchSType;
             job["sQLaunchSVersion"] = sQLaunchSVersion;
+            job["sJavaPath"] = sJavaPath;
             File.WriteAllText("settings.json", job.ToString());
         }
+
+        static string GetString(JObject job, string get, string def)
+        {
+            return job[get] != null ? job[get].ToString() : def;
+        }
+
+        [STAThreadAttribute]
         static void Main(string[] args)
         {
 
@@ -67,14 +82,20 @@ namespace MCServerLauncher
 
             if (!File.Exists("settings.json"))
             {
-                ProgramExit(null, null);
+                SaveSettings();
             } else
             {
                 var job = JObject.Parse(File.ReadAllText("settings.json"));
-                sLatestVersion = job["sLatestVersion"] != null ? job["sLatestVersion"].ToString() : "1.0";
+                sLatestVersion = GetString(job, "sLatestVersion", sLatestVersion);
                 bUseSingleDirectory = job["bUseSingleDirectory"] != null ? bool.Parse(job["bUseSingleDirectory"].ToString()) : false;
                 bReadEULA = job["bReadEULA"] != null ? bool.Parse(job["bReadEULA"].ToString()) : false;
-                sLatestVersion = job["sLaunchArgs"] != null ? job["sLaunchArgs"].ToString() : sLaunchArgs;
+                sLaunchArgs = GetString(job, "sLaunchArgs", sLaunchArgs);
+                sQLaunchSType = GetString(job, "sQLaunchSType", sQLaunchSType);
+                sQLaunchSVersion = GetString(job, "sQLaunchSVersion", sQLaunchSVersion);
+                sJavaPath = GetString(job, "sJavapath", sJavaPath);
+
+
+
             }
 
             // imma just put this in here so i don't feel bad/what ever
@@ -93,16 +114,101 @@ namespace MCServerLauncher
                 }
             }
 
+
+            // Java check
+            if(!Directory.Exists(sJavaPath) || !File.Exists(sJavaPath + "java.exe"))
+            {
+                sJavaPath = null;
+            }
+            if (sJavaPath == null)
+            {
+                bool foundJpath = false;
+                string path = Environment.GetEnvironmentVariable("Path");
+                string[] paths = path.Split(';');
+                foreach(string sDir in paths)
+                {
+                    if (sDir != "")
+                    {
+                        var add = sDir[sDir.Length - 1] == '/' ? "" : "//";
+
+                        if (Directory.Exists(sDir))
+                            if (Directory.Exists(sDir + add + "bin"))
+                                if (File.Exists(sDir + add + "bin/java.exe"))
+                                {
+                                    sJavaPath = sDir + add + "bin";
+                                }
+                        if (File.Exists(sDir + add + "java.exe"))
+                        {
+                            sJavaPath = sDir;
+                        }
+                    }
+                }
+                if (!foundJpath)
+                {
+                    string jpath = Environment.GetEnvironmentVariable("JAVA_HOME");
+
+                    if (jpath == null)
+                    {
+                        while (true)
+                        {
+                            MessageBox.Show("Can't find a java installation, please select from the options below");
+                            Console.WriteLine("1) I have a java installation\n2) I don't have a java installation\n3) Exit");
+                            char key = Console.ReadKey().KeyChar;
+                            if (key == '1')
+                            {
+                                var fbdDialog = new FolderBrowserDialog();
+                                DialogResult fbdResult = fbdDialog.ShowDialog();
+
+
+                                if (fbdResult == DialogResult.OK)
+                                {
+                                    if (Directory.Exists(fbdDialog.SelectedPath + "/bin"))
+                                        if (File.Exists(fbdDialog.SelectedPath + "/bin/java.exe"))
+                                        {
+                                            sJavaPath = fbdDialog.SelectedPath + "bin";
+                                            break;
+                                        }
+                                    if (File.Exists(fbdDialog.SelectedPath + "java.exe"))
+                                        sJavaPath = fbdDialog.SelectedPath;
+                                }
+                            }
+                            if (key == '2')
+                            {
+                                Process.Start("https://www.java.com/en/download/");
+                                Console.Clear();
+                                Console.WriteLine("Download java and relaunch the program\nPress any key to exit");
+                                Console.ReadKey();
+                                Environment.Exit(1);
+                            }
+                            if (key == '3')
+                                Environment.Exit(1);
+
+                            Console.Clear();
+
+                        }
+
+                    }
+                    else
+                    {
+                        sJavaPath = jpath + "\\";
+                    }
+                }
+                SaveSettings();
+            }
+            Console.Clear();
+
+            
+
             Console.Title = "MCServerLauncher 1.0";
             while (true)
             {
-                Console.WriteLine("1) Download / Launch Server\n2) Modify Properties (Broken)\n3) List Versions\n4) Quick Launch (" + sQLaunchSType + " / " + sQLaunchSVersion + ")\n5) Exit");
+                Console.WriteLine("1) Download / Launch Server\n2) Modify Properties\n3) List Versions\n4) Quick Launch (" + sQLaunchSType + " / " + sQLaunchSVersion + ")\n5) Exit");
                 var sel = Console.ReadKey();
                 Console.Clear();
                 switch (sel.KeyChar)
                 {
                     case '1':
-                        Console.WriteLine("1) Vanilla Server\n2) Spigot Server\nOther) Return");
+                        Console.WriteLine("1) Vanilla Server\n2) Spigot Server\nPress any other key to return");
                         var sel2 = Console.ReadKey();
                         Console.Clear();
                         switch (sel2.KeyChar)
@@ -122,9 +228,9 @@ namespace MCServerLauncher
                         modify_prop();
                         break;
                     case '3':
-                        if (Directory.Exists("Servers")) Directory.CreateDirectory("Servers");
-                        if (Directory.Exists("Servers/Spigot")) Directory.CreateDirectory("Servers/Spigot");
-                        if (Directory.Exists("Servers/Vanilla")) Directory.CreateDirectory("Servers/Vanilla");
+                        if (!Directory.Exists("Servers")) Directory.CreateDirectory("Servers");
+                        if (!Directory.Exists("Servers/Spigot")) Directory.CreateDirectory("Servers/Spigot");
+                        if (!Directory.Exists("Servers/Vanilla")) Directory.CreateDirectory("Servers/Vanilla");
                         var saDirs = Directory.GetDirectories("Servers/Vanilla");
                         Console.WriteLine("Avalable Server Versions:\nVanilla)");
                         foreach (string sDir in saDirs)
@@ -174,6 +280,11 @@ namespace MCServerLauncher
         }
         static void modify_prop()
         {
+            Console.WriteLine("Server Type:\n1) Vanilla\n2) Spigot\nPress any other key to return");
+            var stype = Console.ReadKey().KeyChar;
+            if (stype < '1' || stype > '2')
+                return;
+            Console.Clear();
             Console.Write("Server Version: ");
             var str = Console.ReadLine();
 
@@ -182,11 +293,15 @@ namespace MCServerLauncher
 
             CheckServerF();
 
-
-            if (Directory.Exists("Servers/" + str))
+            string sStypeString = (stype == '1' ? "Vanilla/" : "Spigot/");
+            if (Directory.Exists("Servers/" + sStypeString + str))
             {
-                var process = System.Diagnostics.Process.Start("notepad", "Servers/" + str + "/server.properties");
+                /*
+                var process = System.Diagnostics.Process.Start("notepad", "Servers/" + sStypeString + str + "/server.properties");
                 process.WaitForExit();
+                */
+                var pe = new PropertiesEditor("Servers/" + sStypeString + str);
+                pe.ShowDialog();
             } else
             {
                 Console.WriteLine("Couldn't find version!\nPress any button to continue");
@@ -205,9 +320,15 @@ namespace MCServerLauncher
 
 
             CheckServerF();
-
+            Console.SetCursorPosition(0, 1);
+            Console.Write("Type 'back' to return");
+            Console.SetCursorPosition(0, 0);
             Console.Write("Server Version: ");
+            
+
             var str = Console.ReadLine();
+            if (str.ToLower() == "back")
+                return;
         _beginning:
 
             bUseLatest = str == "latest";
@@ -248,6 +369,7 @@ namespace MCServerLauncher
                 {
                     str = o["latest"]["release"].ToString();
                     sLatestVersion = str;
+                    SaveSettings();
                     goto _beginning;
                 }
                 // Parse thru all the version 'till we find the correct one (if we do)
@@ -353,17 +475,25 @@ namespace MCServerLauncher
             }
 
 
+            Console.SetCursorPosition(0, 1);
+            Console.Write("Type 'back' to return");
+            Console.SetCursorPosition(0, 0);
             Console.Write("Server Version: ");
-            string ver = Console.ReadLine();
 
+
+            var ver = Console.ReadLine();
+            if (ver.ToLower() == "back")
+                return;
+
+            ;
                 if (!Directory.Exists("Servers/Spigot/" + ver) || !File.Exists("Servers/Spigot/" + ver + "/server.jar"))
             {
                 Directory.SetCurrentDirectory("BuildTools");
 
-                ProcessStartInfo a = new ProcessStartInfo("java", "-jar BuildTools.jar --rev " + ver);
+                ProcessStartInfo a = new ProcessStartInfo(sJavaPath + "bin/java", "-jar BuildTools.jar --rev " + ver);
                 
                 Process prc = System.Diagnostics.Process.Start(a);
-                Console.WriteLine("Please wait for the download to complete...");
+                Console.WriteLine("Please wait for the download/compilation to complete, this may take a while...");
                 prc.WaitForExit();
                 Directory.SetCurrentDirectory("../");
 
@@ -384,67 +514,97 @@ namespace MCServerLauncher
 
 
 
-    class ServerProperties
+    public class SPropSetting
     {
-        public Dictionary<string, string> ServerVars = new Dictionary<string, string>();
+
+        public static int type_string = 0;
+        public static int type_int = 1;
+        public static int type_boolean = 2;
+
+        public string value = "";
+        public int type = 0;
+        // Types:
+        // 0 : String
+        // 1 : Int
+        // 2 : Boolean
+
+        public SPropSetting(string value, int type)
+        {
+            this.value = value;
+            this.type = type;
+        }
+    }
+
+    public class ServerProperties
+    {
+        public Dictionary<string, SPropSetting> ServerVars = new Dictionary<string, SPropSetting>();
+
 
 
         public ServerProperties()
         {
-            ServerVars["allow-flight"] = "false";
-            ServerVars["allow-nether"] = "true";
-            ServerVars["difficulty"] = "0";
-            ServerVars["enable-command-block"] = "false";
-            ServerVars["enable-query"] = "false";
-            ServerVars["enable-rcon"] = "false";
-            ServerVars["force-gamemode"] = "false";
-            ServerVars["function-permission-level"] = "4";
-            ServerVars["gamemode"] = "0";
-            ServerVars["generate-structures"] = "true";
-            ServerVars["generator-settings"] = "";
-            ServerVars["hardcore"] = "false";
-            ServerVars["level-name"] = "world";
-            ServerVars["level-seed"] = "";
-            ServerVars["level-type"] = "default";
-            ServerVars["max-build-height"] = "256";
-            ServerVars["max-players"] = "20";
-            ServerVars["max-tick-time"] = "60000";
-            ServerVars["max-world-size"] = "29999984";
-            ServerVars["motd"] = "A Minecraft Server";
-            ServerVars["network-compression-threshold"] = "256";
-            ServerVars["online-mode"] = "true";
-            ServerVars["op-permission-level"] = "4";
-            ServerVars["player-idle-timeout"] = "0";
-            ServerVars["prevent-proxy-connections"] = "false";
-            ServerVars["pvp"] = "true";
-            ServerVars["query.port"] = "25565";
-            ServerVars["query.password"] = "25575";
-            ServerVars["resource-pack"] = "";
-            ServerVars["resource-pack-sha1"] = "";
-            ServerVars["server-ip"] = "";
-            ServerVars["server-port"] = "25565";
-            ServerVars["snooper-enabled"] = "true";
-            ServerVars["spawn-animals"] = "true";
-            ServerVars["spawn-monsters"] = "true";
-            ServerVars["spawn-npcs"] = "true";
-            ServerVars["spawn-protection"] = "16";
-            ServerVars["use-native-transport"] = "true";
-            ServerVars["view-distance"] = "10";
-            ServerVars["white-list"] = "false";
-            ServerVars["enforce-whitelist"] = "false";
+            ServerVars["allow-flight"] = new SPropSetting("false",2);
+            ServerVars["allow-nether"] = new SPropSetting("true",2);
+            ServerVars["broadcast-console-to-ops"] = new SPropSetting("true", 2);
+            ServerVars["broadcast-rcon-to-ops"] = new SPropSetting("true", 2);
+            ServerVars["debug"] = new SPropSetting("false", 2);
+            ServerVars["difficulty"] = new SPropSetting("0", 1);
+            ServerVars["enable-command-block"] = new SPropSetting("false",2);
+            ServerVars["enable-query"] = new SPropSetting("false",2);
+            ServerVars["enable-rcon"] = new SPropSetting("false",2);
+            ServerVars["force-gamemode"] = new SPropSetting("false",2);
+            ServerVars["function-permission-level"] = new SPropSetting("4",1);
+            ServerVars["gamemode"] = new SPropSetting("0",1);
+            ServerVars["generate-structures"] = new SPropSetting("true",1);
+            ServerVars["generator-settings"] = new SPropSetting("",0);
+            ServerVars["hardcore"] = new SPropSetting("false",2);
+            ServerVars["level-name"] = new SPropSetting("world",0);
+            ServerVars["level-seed"] = new SPropSetting("",0);
+            ServerVars["level-type"] = new SPropSetting("default",0);
+            ServerVars["max-build-height"] = new SPropSetting("256",1);
+            ServerVars["max-players"] = new SPropSetting("20",1);
+            ServerVars["max-tick-time"] = new SPropSetting("60000",1);
+            ServerVars["max-world-size"] = new SPropSetting("29999984",1);
+            ServerVars["motd"] = new SPropSetting("A Minecraft Server",0);
+            ServerVars["network-compression-threshold"] = new SPropSetting("256",1);
+            ServerVars["online-mode"] = new SPropSetting("true",2);
+            ServerVars["op-permission-level"] = new SPropSetting("4",1);
+            ServerVars["player-idle-timeout"] = new SPropSetting("0",1);
+            ServerVars["prevent-proxy-connections"] = new SPropSetting("false",2);
+            ServerVars["pvp"] = new SPropSetting("true",2);
+            ServerVars["query.port"] = new SPropSetting("25565",1);
+            ServerVars["query.password"] = new SPropSetting("25575",1);
+            ServerVars["rcon.port"] = new SPropSetting("25575", 1);
+            ServerVars["rcon.password"] = new SPropSetting("", 0);
+            ServerVars["resource-pack"] = new SPropSetting("",0);
+            ServerVars["resource-pack-sha1"] = new SPropSetting("",0);
+            ServerVars["server-ip"] = new SPropSetting("",0);
+            ServerVars["server-port"] = new SPropSetting("25565",1);
+            ServerVars["snooper-enabled"] = new SPropSetting("true",2);
+            ServerVars["spawn-animals"] = new SPropSetting("true",2);
+            ServerVars["spawn-monsters"] = new SPropSetting("true",2);
+            ServerVars["spawn-npcs"] = new SPropSetting("true",2);
+            ServerVars["spawn-protection"] = new SPropSetting("16",1);
+            ServerVars["use-native-transport"] = new SPropSetting("true",2);
+            ServerVars["view-distance"] = new SPropSetting("10",1);
+            ServerVars["white-list"] = new SPropSetting("false",2);
+            ServerVars["enforce-whitelist"] = new SPropSetting("false",2);
         }
 
         public static ServerProperties FromFile(string file)
         {
             var spProp = new ServerProperties();
 
-            string[] lines = File.ReadAllLines(file);
-            foreach(string line in lines)
+            if (File.Exists(file))
             {
-                if(line[0] != '#')
+                string[] lines = File.ReadAllLines(file);
+                foreach (string line in lines)
                 {
-                    var vs = line.Split('=');
-                    spProp.ServerVars[vs[0]] = vs[1];
+                    if (line[0] != '#')
+                    {
+                        var vs = line.Split('=');
+                        spProp.ServerVars[vs[0]].value = vs[1];
+                    }
                 }
             }
 
@@ -454,9 +614,9 @@ namespace MCServerLauncher
         {
 
             var str = "";
-            foreach( KeyValuePair<string,string> KVP in ServerVars)
+            foreach( KeyValuePair<string,SPropSetting> KVP in ServerVars)
             {
-                str+=KVP.Key + "=" + KVP.Value + "\n";
+                str+=KVP.Key + "=" + KVP.Value.value + "\n";
             }
 
             return str;
