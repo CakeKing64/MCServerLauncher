@@ -1,6 +1,6 @@
 # MCServerLauncher
 
-Allows for an easy way to create Vanilla (for now) servers
+Allows for an easy way to create Vanilla and Spigot servers
 
 
 Cool things:
