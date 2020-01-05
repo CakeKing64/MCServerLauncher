@@ -16,6 +16,8 @@ namespace MCServerLauncher
         static bool Modify = false;
         static string sPropDir = "";
         ServerProperties sprop = null;
+        static Font fnt_regular = new Font(new FontFamily("Consolas"), 8, FontStyle.Regular);
+        static Font fnt_bold = new Font(new FontFamily("Consolas"), 8, FontStyle.Bold);
         public PropertiesEditor(string dir)
         {
             InitializeComponent();
@@ -23,6 +25,9 @@ namespace MCServerLauncher
         }
         List<TextBox> keys = new List<TextBox>();
         List<Object> values = new List<Object>();
+
+
+
         private void PropertiesEditor_Load(object sender, EventArgs e)
         {
             sprop = ServerProperties.FromFile(sPropDir + "/server.properties");
@@ -164,11 +169,51 @@ namespace MCServerLauncher
         {
             Save();
             Modify = false;
+            MessageBox.Show("Saved.");
         }
 
         private void BtnExit_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void TextBox1_TextChanged(object sender, EventArgs e)
+        {
+            TextBox tbSender = (TextBox)sender;
+            foreach (TextBox tb in keys)
+            {
+                if(tb.Text.ToLower().Contains(tbSender.Text.ToLower()) && tbSender.Text != "")
+                {
+                    tb.BackColor = Color.FromArgb(255, 140, 0);
+                } else
+                {
+                    tb.BackColor = SystemColors.InactiveCaption;
+                }
+            }
+
+            int p = 0;
+            foreach (TextBox tb in keys)
+            {
+                var stype = sprop.ServerVars[tb.Text].type;
+
+                TextBox valtext = null;
+                if (stype == 0 || stype == 1)
+                {
+                    valtext = (TextBox)values[p];
+                    if (valtext.Text.ToLower().Contains(tbSender.Text.ToLower()) && tbSender.Text != "")
+                    {
+                        valtext.BackColor = Color.FromArgb(255, 140, 0);
+                    }
+                    else
+                    {
+                        valtext.BackColor = SystemColors.InactiveCaption;
+                    }
+
+                }
+
+                p++;
+            }
+
         }
     }
 }

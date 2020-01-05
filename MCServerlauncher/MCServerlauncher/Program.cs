@@ -43,9 +43,11 @@ namespace MCServerLauncher
             sQLaunchSVersion = vnumb;
             SaveSettings();
             Directory.SetCurrentDirectory("Servers/" + stype + "/" + vnumb);
-            ProcessStartInfo a = new ProcessStartInfo(sJavaPath + "bin/java", sLaunchArgs);
-
+            ProcessStartInfo a = new ProcessStartInfo(sJavaPath + "/java.exe", sLaunchArgs);
+           // a.RedirectStandardOutput = true;
+           //a.UseShellExecute = false;
             System.Diagnostics.Process.Start(a);
+            //System.Threading.Thread.Sleep(10000);
             Directory.SetCurrentDirectory("../../../");
 
         }
@@ -97,7 +99,7 @@ namespace MCServerLauncher
 
 
             }
-
+          
             // imma just put this in here so i don't feel bad/what ever
             MessageBoxResult mbrResult = MessageBoxResult.No;
 
@@ -124,16 +126,18 @@ namespace MCServerLauncher
             {
                 bool foundJpath = false;
                 string path = Environment.GetEnvironmentVariable("Path");
+               
                 string[] paths = path.Split(';');
                 foreach(string sDir in paths)
                 {
                     if (sDir != "")
                     {
-                        var add = sDir[sDir.Length - 1] == '/' ? "" : "//";
+                        var add = sDir[sDir.Length - 1] == '/' ? "" : "/";
 
+                       
                         if (Directory.Exists(sDir))
                             if (Directory.Exists(sDir + add + "bin"))
-                                if (File.Exists(sDir + add + "bin/java.exe"))
+                                if (File.Exists(sDir + add + "bin\\java.exe"))
                                 {
                                     sJavaPath = sDir + add + "bin";
                                 }
@@ -143,10 +147,11 @@ namespace MCServerLauncher
                         }
                     }
                 }
-                if (!foundJpath)
+               
+                if (sJavaPath == null)
                 {
                     string jpath = Environment.GetEnvironmentVariable("JAVA_HOME");
-
+                    
                     if (jpath == null)
                     {
                         while (true)
@@ -159,13 +164,14 @@ namespace MCServerLauncher
                                 var fbdDialog = new FolderBrowserDialog();
                                 DialogResult fbdResult = fbdDialog.ShowDialog();
 
-
+                                MessageBox.Show(fbdDialog.SelectedPath + "/bin/java.exe");
                                 if (fbdResult == DialogResult.OK)
                                 {
                                     if (Directory.Exists(fbdDialog.SelectedPath + "/bin"))
                                         if (File.Exists(fbdDialog.SelectedPath + "/bin/java.exe"))
                                         {
-                                            sJavaPath = fbdDialog.SelectedPath + "bin";
+                                            sJavaPath = fbdDialog.SelectedPath + "\\bin";
+                                           // Environment.SetEnvironmentVariable("Path", Environment.GetEnvironmentVariable("Path") + ";" + sJavaPath);
                                             break;
                                         }
                                     if (File.Exists(fbdDialog.SelectedPath + "java.exe"))
@@ -202,6 +208,7 @@ namespace MCServerLauncher
             Console.Title = "MCServerLauncher 1.0";
             while (true)
             {
+                
                 Console.WriteLine("1) Download / Launch Server\n2) Modify Properties\n3) List Versions\n4) Quick Launch (" + sQLaunchSType + " / " + sQLaunchSVersion + ")\n5) Exit");
                 var sel = Console.ReadKey();
                 Console.Clear();
@@ -292,8 +299,10 @@ namespace MCServerLauncher
 
 
             var str = Console.ReadLine();
+            Console.Clear();
             if (str.ToLower() == "back")
                 return;
+            Console.WriteLine("Server Version: " + str);
 
             if (str == "latest")
                 str = GetLatest();
@@ -332,8 +341,12 @@ namespace MCServerLauncher
             
 
             var str = Console.ReadLine();
+            Console.Clear();
             if (str.ToLower() == "back")
                 return;
+            Console.WriteLine("Server Version: " + str);
+
+
         _beginning:
 
             bUseLatest = str == "latest";
@@ -487,15 +500,18 @@ namespace MCServerLauncher
 
 
             var ver = Console.ReadLine();
+            Console.Clear();
             if (ver.ToLower() == "back")
                 return;
 
-            ;
+            Console.WriteLine("Server Version: " + ver);
+
+            
                 if (!Directory.Exists("Servers/Spigot/" + ver) || !File.Exists("Servers/Spigot/" + ver + "/server.jar"))
             {
                 Directory.SetCurrentDirectory("BuildTools");
 
-                ProcessStartInfo a = new ProcessStartInfo(sJavaPath + "bin/java", "-jar BuildTools.jar --rev " + ver);
+                ProcessStartInfo a = new ProcessStartInfo(sJavaPath + "/java", "-jar BuildTools.jar --rev " + ver);
                 
                 Process prc = System.Diagnostics.Process.Start(a);
                 Console.WriteLine("Please wait for the download/compilation to complete, this may take a while...");
