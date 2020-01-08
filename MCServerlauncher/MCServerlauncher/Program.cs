@@ -11,28 +11,40 @@ using System.Net;
 using System.Windows;
 using System.Windows.Forms;
 using MessageBox = System.Windows.MessageBox;
+using System.Runtime.InteropServices;
 
 namespace MCServerLauncher
 {
     class Program
     {
 
-        // Settings
-        static bool bUseSingleDirectory = false;
-        static string sLatestVersion = "1.0";
-        static bool bReadEULA = false;
-        static string sLaunchArgs = "-Xmx1024M -Xms1024M -jar server.jar nogui";
-        static string sQLaunchSType = "Vanilla";
-        static string sQLaunchSVersion = "1.0";
-        static string sJavaPath = null;
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
 
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        const int SW_HIDE = 0;
+        const int SW_SHOW = 5;
+
+
+        // Settings
+        public static bool bUseSingleDirectory = false;
+        public static string sLatestVersion = "1.0";
+        public static bool bReadEULA = false;
+        public static string sLaunchArgs = "-Xmx1024M -Xms1024M -jar server.jar nogui";
+        public static string sQLaunchSType = "Vanilla";
+        public static string sQLaunchSVersion = "1.0";
+        public static string sJavaPath = null;
+        public static bool bUseGUI = false;
+        public static bool bCloseOnServerLaunch = false;
 
         static string GetLatest()
         {
             return sLatestVersion;
         }
-
-        static void launch(string stype, string vnumb)
+        [STAThread]
+        public static void launch(string stype, string vnumb)
         {
             if (!Directory.Exists("Servers/" + stype + "/"  + vnumb) || !File.Exists("Servers/" + stype + "/" + vnumb + "/server.jar"))
             {
@@ -50,13 +62,18 @@ namespace MCServerLauncher
             //System.Threading.Thread.Sleep(10000);
             Directory.SetCurrentDirectory("../../../");
 
+            if(bCloseOnServerLaunch)
+            {
+                Environment.Exit(1);
+            }
+
         }
 
         static void ProgramExit(object sender, EventArgs ea)
         {
             SaveSettings();
         }
-        static void SaveSettings()
+        public static void SaveSettings()
         {
             JObject job = new JObject();
             job["bUseSingleDirectory"] = bUseSingleDirectory;
@@ -67,15 +84,17 @@ namespace MCServerLauncher
             job["sQLaunchSType"] = sQLaunchSType;
             job["sQLaunchSVersion"] = sQLaunchSVersion;
             job["sJavaPath"] = sJavaPath;
+            job["bUseGUI"] = bUseGUI;
+            job["bCloseOnServerLaunch"] = bCloseOnServerLaunch;
             File.WriteAllText("settings.json", job.ToString());
         }
 
-        static string GetString(JObject job, string get, string def)
+        public static string GetString(JObject job, string get, string def)
         {
             return job[get] != null ? job[get].ToString() : def;
         }
 
-        [STAThreadAttribute]
+        [STAThread]
         static void Main(string[] args)
         {
 
@@ -95,8 +114,8 @@ namespace MCServerLauncher
                 sQLaunchSType = GetString(job, "sQLaunchSType", sQLaunchSType);
                 sQLaunchSVersion = GetString(job, "sQLaunchSVersion", sQLaunchSVersion);
                 sJavaPath = GetString(job, "sJavapath", sJavaPath);
-
-
+                bUseGUI = job["bUseGUI"] != null ? bool.Parse(job["bUseGUI"].ToString()) : false;
+                bCloseOnServerLaunch = job["bCloseOnServerLaunch"] != null ? bool.Parse(job["bCloseOnServerLaunch"].ToString()) : false;
 
             }
           
@@ -203,7 +222,16 @@ namespace MCServerLauncher
             }
             Console.Clear();
 
-            
+            if(bUseGUI)
+            {
+                var conHandle = GetConsoleWindow();
+                ShowWindow(conHandle, SW_HIDE);
+
+                var slLauncher = new ServerLauncher();
+
+                slLauncher.ShowDialog();
+                return;
+            }
 
             Console.Title = "MCServerLauncher 1.0";
             while (true)
@@ -221,10 +249,10 @@ namespace MCServerLauncher
                         switch (sel2.KeyChar)
                         {
                             case '1':
-                                start_server_vanilla();
+                                start_server_vanilla(null);
                                 break;
                             case '2':
-                                start_server_spigot();
+                                start_server_spigot(null);
                                 break;
                             default:
                                 break;
@@ -273,7 +301,7 @@ namespace MCServerLauncher
 
         }
 
-        static void CheckServerF()
+        public static void CheckServerF()
         {
             if (!Directory.Exists("Servers"))
                 Directory.CreateDirectory("Servers");
@@ -281,11 +309,11 @@ namespace MCServerLauncher
                 Directory.CreateDirectory("Servers/Vanilla");
         }
 
-        static string GetSDV()
+        public static string GetSDV()
         {
             return "Servers/Vanilla/";
         }
-        static void modify_prop()
+        public static void modify_prop()
         {
             Console.WriteLine("Server Type:\n1) Vanilla\n2) Spigot\nPress any other key to return");
             var stype = Console.ReadKey().KeyChar;
@@ -318,35 +346,42 @@ namespace MCServerLauncher
                 pe.Dispose();
             } else
             {
-                Console.WriteLine("Couldn't find version!\nPress any button to continue");
-                Console.ReadKey();
+                if (!bUseGUI)
+                {
+                    Console.WriteLine("Couldn't find version!\nPress any button to continue");
+                    Console.ReadKey();
+                } else
+                {
+                    Console.WriteLine("Couldn't find version!");
+                }
             }
 
         }
 
-    #region "Vanilla Server"
-        static void start_server_vanilla()
+        #region "Vanilla Server"
+        public static void start_server_vanilla(string version)
         {
             bool bFoundVersion = false; // Found Version check
             bool bFoundServer = false;  // Found Server check
             var client = new WebClient(); // For downloading the json files
             var bUseLatest = false;
+            string str = version;
+            if (version == null)
+            {
+                CheckServerF();
+                Console.SetCursorPosition(0, 1);
+                Console.Write("Type 'back' to return");
+                Console.SetCursorPosition(0, 0);
+                Console.Write("Server Version: ");
 
 
-            CheckServerF();
-            Console.SetCursorPosition(0, 1);
-            Console.Write("Type 'back' to return");
-            Console.SetCursorPosition(0, 0);
-            Console.Write("Server Version: ");
-            
+                str = Console.ReadLine();
+                Console.Clear();
+                if (str.ToLower() == "back")
+                    return;
+                Console.WriteLine("Server Version: " + str);
 
-            var str = Console.ReadLine();
-            Console.Clear();
-            if (str.ToLower() == "back")
-                return;
-            Console.WriteLine("Server Version: " + str);
-
-
+            }
         _beginning:
 
             bUseLatest = str == "latest";
@@ -419,8 +454,13 @@ namespace MCServerLauncher
                 }
                 else
                 {
-                    Console.WriteLine("Couldn't find version " + str + "\nPress any button to return to continue");
-                    Console.ReadKey();
+                    if (!bUseGUI)
+                    {
+                        Console.WriteLine("Couldn't find version " + str + "\nPress any button to return to continue");
+                        Console.ReadKey();
+                    }
+                    else
+                        Console.WriteLine("Couldn't find version " + str);
                     return;
                 }
 
@@ -450,8 +490,15 @@ namespace MCServerLauncher
                     }
                     catch
                     {
-                        Console.WriteLine("Failed to download server.jar\nPress any button to continue.");
-                        Console.ReadKey();
+                        if (!bUseGUI)
+                        {
+                            Console.WriteLine("Failed to download server.jar\nPress any button to continue.");
+                            Console.ReadKey();
+                        }
+                        else
+                            Console.WriteLine("Failed to download server.jar");
+
+
                         return;
                     }
 
@@ -474,8 +521,8 @@ namespace MCServerLauncher
         #endregion
 
 
-    #region "Spigot Server"
-        static void start_server_spigot()
+        #region "Spigot Server"
+        public static void start_server_spigot(string version)
         {
             var client = new WebClient(); // For downloading the json files
 
