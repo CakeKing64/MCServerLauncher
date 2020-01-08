@@ -37,6 +37,7 @@ namespace MCServerLauncher
         public static string sQLaunchSVersion = "1.0";
         public static string sJavaPath = null;
         public static bool bUseGUI = false;
+        public static bool bFirstStart = true;
         public static bool bCloseOnServerLaunch = false;
 
         static string GetLatest()
@@ -86,6 +87,7 @@ namespace MCServerLauncher
             job["sJavaPath"] = sJavaPath;
             job["bUseGUI"] = bUseGUI;
             job["bCloseOnServerLaunch"] = bCloseOnServerLaunch;
+            job["bFirstStart"] = bFirstStart;
             File.WriteAllText("settings.json", job.ToString());
         }
 
@@ -116,7 +118,7 @@ namespace MCServerLauncher
                 sJavaPath = GetString(job, "sJavapath", sJavaPath);
                 bUseGUI = job["bUseGUI"] != null ? bool.Parse(job["bUseGUI"].ToString()) : false;
                 bCloseOnServerLaunch = job["bCloseOnServerLaunch"] != null ? bool.Parse(job["bCloseOnServerLaunch"].ToString()) : false;
-
+                bFirstStart = job["bFirstStart"] != null ? bool.Parse(job["bFirstStart"].ToString()) : true;
             }
           
             // imma just put this in here so i don't feel bad/what ever
@@ -143,7 +145,6 @@ namespace MCServerLauncher
             }
             if (sJavaPath == null)
             {
-                bool foundJpath = false;
                 string path = Environment.GetEnvironmentVariable("Path");
                
                 string[] paths = path.Split(';');
@@ -222,6 +223,31 @@ namespace MCServerLauncher
             }
             Console.Clear();
 
+            if(bFirstStart)
+            {
+                while (true)
+                {
+                    Console.Clear();
+                    Console.WriteLine("This program has can use either console or a GUI , please select the one you'd like to use (this can be changed later)\n1) GUI (Recommended)\n2) Console");
+
+                    var key = Console.ReadKey().KeyChar;
+                    if (key == '1')
+                    {
+                        bUseGUI = true;
+                        bFirstStart = false;
+                        break;
+                    }
+                    else if (key == '2')
+                    {
+                        bUseGUI = false;
+                        bFirstStart = false;
+                        break;
+                    }
+                }
+                Console.Clear();
+                SaveSettings();
+
+            }
             if(bUseGUI)
             {
                 var conHandle = GetConsoleWindow();
@@ -237,7 +263,7 @@ namespace MCServerLauncher
             while (true)
             {
                 
-                Console.WriteLine("1) Download / Launch Server\n2) Modify Properties\n3) List Versions\n4) Quick Launch (" + sQLaunchSType + " / " + sQLaunchSVersion + ")\n5) Exit");
+                Console.WriteLine("1) Download / Launch Server\n2) Modify Properties\n3) List Versions\n4) Quick Launch (" + sQLaunchSType + " / " + sQLaunchSVersion + ")\n5) Switch to GUI mode\n6) Exit");
                 var sel = Console.ReadKey();
                 Console.Clear();
                 switch (sel.KeyChar)
@@ -249,10 +275,10 @@ namespace MCServerLauncher
                         switch (sel2.KeyChar)
                         {
                             case '1':
-                                start_server_vanilla(null);
+                                start_server_vanilla(null,false);
                                 break;
                             case '2':
-                                start_server_spigot(null);
+                                start_server_spigot(null,false);
                                 break;
                             default:
                                 break;
@@ -287,6 +313,14 @@ namespace MCServerLauncher
                         launch(sQLaunchSType, sQLaunchSVersion);
                         break;
                     case '5':
+                        bUseGUI = true;
+                        var cp = Process.GetCurrentProcess();
+                        string exe = cp.MainModule.FileName;
+                        ProcessStartInfo a = new ProcessStartInfo(exe);
+                        System.Diagnostics.Process.Start(a);
+                        Environment.Exit(1);
+                        break;
+                    case '6':
                         Environment.Exit(1);
                         break;
                     default:
@@ -359,7 +393,7 @@ namespace MCServerLauncher
         }
 
         #region "Vanilla Server"
-        public static void start_server_vanilla(string version)
+        public static void start_server_vanilla(string version, bool redownload)
         {
             bool bFoundVersion = false; // Found Version check
             bool bFoundServer = false;  // Found Server check
@@ -384,8 +418,10 @@ namespace MCServerLauncher
             }
         _beginning:
 
-            bUseLatest = str == "latest";
-            if (Directory.Exists(GetSDV() + str))
+            bUseLatest = str == "latest" || str == "Latest";
+            if(redownload)
+            File.Delete((GetSDV() + str + "/server.jar"));
+            if (Directory.Exists(GetSDV() + str) && File.Exists(GetSDV() + str + "/server.jar"))
             {
                 launch("Vanilla",str);
 
@@ -400,7 +436,7 @@ namespace MCServerLauncher
                 }
                 catch
                 {
-                    if (str != "latest")
+                    if (str.ToLower() != "latest")
                     {
                         Console.WriteLine("Failed to download version list, quitting...");
                         System.Threading.Thread.Sleep(3000); // Wait 3 secs
@@ -425,6 +461,8 @@ namespace MCServerLauncher
                     SaveSettings();
                     goto _beginning;
                 }
+
+                bool bSnapshot = false;
                 // Parse thru all the version 'till we find the correct one (if we do)
                 foreach (JToken token in o["versions"])
                 {
@@ -432,6 +470,10 @@ namespace MCServerLauncher
                     {
                         Console.WriteLine("Found version " + str);
                         bFoundVersion = true;
+                        if(token["type"].ToString() == "snapshot")
+                        {
+                            bSnapshot = true;
+                        }
                         client.DownloadFile(token["url"].ToString(), str + ".json");
                     }
                 }
@@ -446,7 +488,12 @@ namespace MCServerLauncher
                     File.Delete(str + ".json");
                     o = JObject.Parse(s);
                     tServer = o["downloads"]["server"];
-
+                    if(bSnapshot)
+                    {
+                        var c = JObject.Parse(File.ReadAllText("Servers/Vanilla/snapshot_parents.json"));
+                        c[str] = o["assets"].ToString();
+                        File.WriteAllText("Servers/Vanilla/snapshot_parents.json", c.ToString());
+                    }
                     if (tServer != null)
                     {
                         bFoundServer = true;
@@ -522,35 +569,42 @@ namespace MCServerLauncher
 
 
         #region "Spigot Server"
-        public static void start_server_spigot(string version)
+        public static void start_server_spigot(string version, bool redownload)
         {
             var client = new WebClient(); // For downloading the json files
+            var ver = "";
 
-            
+            ver = version;
+
             // Download build tools first
             if (!Directory.Exists("BuildTools"))
             {
                 Directory.CreateDirectory("BuildTools");
             }
-            if (!File.Exists("BuildTools/BuildTools.jar")) 
+            if (!File.Exists("BuildTools/BuildTools.jar"))
             {
                 Console.WriteLine("Downloading BuildTools...");
                 client.DownloadFile("https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar", "BuildTools/BuildTools.jar");
                 Console.Clear();
             }
 
+            if (!bUseGUI)
+            {
+                Console.SetCursorPosition(0, 1);
+                Console.Write("Type 'back' to return");
+                Console.SetCursorPosition(0, 0);
+                Console.Write("Server Version: ");
 
-            Console.SetCursorPosition(0, 1);
-            Console.Write("Type 'back' to return");
-            Console.SetCursorPosition(0, 0);
-            Console.Write("Server Version: ");
 
-
-            var ver = Console.ReadLine();
-            Console.Clear();
-            if (ver.ToLower() == "back")
-                return;
-
+                ver = Console.ReadLine();
+                Console.Clear();
+                if (ver.ToLower() == "back")
+                    return;
+            }
+            if(redownload)
+            {
+                File.Delete("Servers/Spigot/" + ver + "/server.jar");
+            }
             Console.WriteLine("Server Version: " + ver);
 
             
@@ -642,10 +696,10 @@ namespace MCServerLauncher
             ServerVars["pvp"] = new SPropSetting("true",2);
             ServerVars["query.port"] = new SPropSetting("25565",1);
             ServerVars["query.password"] = new SPropSetting("",1);
-            ServerVars["rcon.port"] = new SPropSetting("25575", 1);
+            ServerVars["rcon.port"] = new SPropSetting("25575", 1); 
             ServerVars["rcon.password"] = new SPropSetting("", 0);
-            ServerVars["resource-pack"] = new SPropSetting("",0);
-            ServerVars["resource-pack-sha1"] = new SPropSetting("",0);
+            ServerVars["resource-pack"] = new SPropSetting(null,0);         // Set to null because some older servers use texture packs
+            ServerVars["resource-pack-sha1"] = new SPropSetting(null,0);
             ServerVars["server-ip"] = new SPropSetting("",0);
             ServerVars["server-port"] = new SPropSetting("25565",1);
             ServerVars["snooper-enabled"] = new SPropSetting("true",2);
@@ -653,6 +707,7 @@ namespace MCServerLauncher
             ServerVars["spawn-monsters"] = new SPropSetting("true",2);
             ServerVars["spawn-npcs"] = new SPropSetting("true",2);
             ServerVars["spawn-protection"] = new SPropSetting("16",1);
+            ServerVars["texture-pack"] = new SPropSetting(null, 0);        // Legacy
             ServerVars["use-native-transport"] = new SPropSetting("true",2);
             ServerVars["view-distance"] = new SPropSetting("10",1);
             ServerVars["white-list"] = new SPropSetting("false",2);

@@ -35,47 +35,49 @@ namespace MCServerLauncher
             Font fnt = new Font("Consolas", 8); 
             foreach (KeyValuePair<string,SPropSetting> KVP in sprop.ServerVars)
             {
-
-                var tbNewBox = new TextBox();
-                tbNewBox.Text = KVP.Key;
-                tbNewBox.Location = new Point(0, y);
-               
-                tbNewBox.BackColor = SystemColors.InactiveCaption;
-                tbNewBox.Size = new Size(200, 20);
-                tbNewBox.TextAlign = HorizontalAlignment.Right;
-                tbNewBox.Font = fnt;
-                tbNewBox.ReadOnly = true;
-                keys.Add(tbNewBox);
-                switch(KVP.Value.type)
+                if (KVP.Value != null)
                 {
-                    case 0: // String
-                    case 1: // Int
-                        var tbNewBox2 = new TextBox();
-                        tbNewBox2.Text = KVP.Value.value;
-                        tbNewBox2.Location = new Point(200, y);
-                        tbNewBox2.BackColor = SystemColors.ActiveCaption;
-                        tbNewBox2.Size = new Size(200, 20);
-                        tbNewBox2.TextAlign = HorizontalAlignment.Left;
-                        tbNewBox2.Font = fnt;
-                        tbNewBox2.TextChanged += ItemChanged;
-                        values.Add(tbNewBox2);
-                        Controls.Add(tbNewBox2);
-                        break;
-                    case 2:
-                        var chkNewCheck = new CheckBox();
-                        chkNewCheck.Checked = bool.Parse(KVP.Value.value);
-                        chkNewCheck.Location = new Point(200, y);
-                        chkNewCheck.Size = new Size(200, 20);
-                        chkNewCheck.CheckedChanged += ItemChanged;
-                        Controls.Add(chkNewCheck);
-                        values.Add(chkNewCheck);
-                        break;
-                    default:break;
+                    var tbNewBox = new TextBox();
+                    tbNewBox.Text = KVP.Key;
+                    tbNewBox.Location = new Point(0, y);
 
+                    tbNewBox.BackColor = SystemColors.InactiveCaption;
+                    tbNewBox.Size = new Size(200, 20);
+                    tbNewBox.TextAlign = HorizontalAlignment.Right;
+                    tbNewBox.Font = fnt;
+                    tbNewBox.ReadOnly = true;
+                    keys.Add(tbNewBox);
+                    switch (KVP.Value.type)
+                    {
+                        case 0: // String
+                        case 1: // Int
+                            var tbNewBox2 = new TextBox();
+                            tbNewBox2.Text = KVP.Value.value;
+                            tbNewBox2.Location = new Point(200, y);
+                            tbNewBox2.BackColor = SystemColors.ActiveCaption;
+                            tbNewBox2.Size = new Size(200, 20);
+                            tbNewBox2.TextAlign = HorizontalAlignment.Left;
+                            tbNewBox2.Font = fnt;
+                            tbNewBox2.TextChanged += ItemChanged;
+                            values.Add(tbNewBox2);
+                            Controls.Add(tbNewBox2);
+                            break;
+                        case 2:
+                            var chkNewCheck = new CheckBox();
+                            chkNewCheck.Checked = bool.Parse(KVP.Value.value);
+                            chkNewCheck.Location = new Point(200, y);
+                            chkNewCheck.Size = new Size(200, 20);
+                            chkNewCheck.CheckedChanged += ItemChanged;
+                            Controls.Add(chkNewCheck);
+                            values.Add(chkNewCheck);
+                            break;
+                        default: break;
+
+                    }
+                    y += 20;
+
+                    Controls.Add(tbNewBox);
                 }
-                y += 20;
-
-                Controls.Add(tbNewBox);
             }
                 
         }

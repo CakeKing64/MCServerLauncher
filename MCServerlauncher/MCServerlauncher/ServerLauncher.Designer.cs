@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServerLauncher));
             this.btnLaunch = new System.Windows.Forms.Button();
             this.tbConsole = new System.Windows.Forms.TextBox();
             this.btnModifyProp = new System.Windows.Forms.Button();
@@ -39,6 +40,10 @@
             this.lblInstalled = new System.Windows.Forms.Label();
             this.btnReturn = new System.Windows.Forms.Button();
             this.chkCOSL = new System.Windows.Forms.CheckBox();
+            this.btnRedownload = new System.Windows.Forms.Button();
+            this.btnConsoleMode = new System.Windows.Forms.Button();
+            this.lblQLaunch = new System.Windows.Forms.Label();
+            this.btnQuit = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnLaunch
@@ -78,7 +83,7 @@
             this.lbVersion.FormattingEnabled = true;
             this.lbVersion.Location = new System.Drawing.Point(12, 114);
             this.lbVersion.Name = "lbVersion";
-            this.lbVersion.Size = new System.Drawing.Size(120, 95);
+            this.lbVersion.Size = new System.Drawing.Size(120, 173);
             this.lbVersion.TabIndex = 4;
             this.lbVersion.Visible = false;
             this.lbVersion.SelectedIndexChanged += new System.EventHandler(this.LbVersion_SelectedIndexChanged);
@@ -90,6 +95,7 @@
             this.tbVersion.Size = new System.Drawing.Size(187, 20);
             this.tbVersion.TabIndex = 5;
             this.tbVersion.Visible = false;
+            this.tbVersion.TextChanged += new System.EventHandler(this.TbVersion_TextChanged);
             // 
             // btnLaunchS
             // 
@@ -131,7 +137,7 @@
             // lblInstalled
             // 
             this.lblInstalled.AutoSize = true;
-            this.lblInstalled.Location = new System.Drawing.Point(9, 98);
+            this.lblInstalled.Location = new System.Drawing.Point(12, 93);
             this.lblInstalled.Name = "lblInstalled";
             this.lblInstalled.Size = new System.Drawing.Size(89, 13);
             this.lblInstalled.TabIndex = 10;
@@ -140,7 +146,7 @@
             // 
             // btnReturn
             // 
-            this.btnReturn.Location = new System.Drawing.Point(12, 237);
+            this.btnReturn.Location = new System.Drawing.Point(12, 300);
             this.btnReturn.Name = "btnReturn";
             this.btnReturn.Size = new System.Drawing.Size(75, 23);
             this.btnReturn.TabIndex = 11;
@@ -161,11 +167,58 @@
             this.chkCOSL.Visible = false;
             this.chkCOSL.CheckedChanged += new System.EventHandler(this.CheckBox1_CheckedChanged);
             // 
+            // btnRedownload
+            // 
+            this.btnRedownload.Location = new System.Drawing.Point(358, 12);
+            this.btnRedownload.Name = "btnRedownload";
+            this.btnRedownload.Size = new System.Drawing.Size(124, 36);
+            this.btnRedownload.TabIndex = 13;
+            this.btnRedownload.Text = "Re-Download";
+            this.btnRedownload.UseVisualStyleBackColor = true;
+            this.btnRedownload.Visible = false;
+            this.btnRedownload.Click += new System.EventHandler(this.Button1_Click_1);
+            // 
+            // btnConsoleMode
+            // 
+            this.btnConsoleMode.Location = new System.Drawing.Point(654, 160);
+            this.btnConsoleMode.Name = "btnConsoleMode";
+            this.btnConsoleMode.Size = new System.Drawing.Size(134, 23);
+            this.btnConsoleMode.TabIndex = 14;
+            this.btnConsoleMode.Text = "Switch to Console mode";
+            this.btnConsoleMode.UseVisualStyleBackColor = true;
+            this.btnConsoleMode.Click += new System.EventHandler(this.Button1_Click_2);
+            // 
+            // lblQLaunch
+            // 
+            this.lblQLaunch.AutoSize = true;
+            this.lblQLaunch.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblQLaunch.Location = new System.Drawing.Point(205, 104);
+            this.lblQLaunch.Name = "lblQLaunch";
+            this.lblQLaunch.Size = new System.Drawing.Size(144, 19);
+            this.lblQLaunch.TabIndex = 15;
+            this.lblQLaunch.Text = "sands undertale";
+            this.lblQLaunch.Visible = false;
+            // 
+            // btnQuit
+            // 
+            this.btnQuit.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.btnQuit.Location = new System.Drawing.Point(12, 138);
+            this.btnQuit.Name = "btnQuit";
+            this.btnQuit.Size = new System.Drawing.Size(187, 36);
+            this.btnQuit.TabIndex = 16;
+            this.btnQuit.Text = "Q&uit";
+            this.btnQuit.UseVisualStyleBackColor = false;
+            this.btnQuit.Click += new System.EventHandler(this.BtnQuit_Click);
+            // 
             // ServerLauncher
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnQuit);
+            this.Controls.Add(this.lblQLaunch);
+            this.Controls.Add(this.btnConsoleMode);
+            this.Controls.Add(this.btnRedownload);
             this.Controls.Add(this.chkCOSL);
             this.Controls.Add(this.btnReturn);
             this.Controls.Add(this.lblInstalled);
@@ -177,8 +230,10 @@
             this.Controls.Add(this.btnModifyProp);
             this.Controls.Add(this.tbConsole);
             this.Controls.Add(this.btnLaunch);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ServerLauncher";
-            this.Text = "ServerLauncher";
+            this.Text = "Server Launcher";
+            this.Load += new System.EventHandler(this.ServerLauncher_Load);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ServerLauncher_KeyPress);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -198,5 +253,9 @@
         private System.Windows.Forms.Label lblInstalled;
         private System.Windows.Forms.Button btnReturn;
         private System.Windows.Forms.CheckBox chkCOSL;
+        private System.Windows.Forms.Button btnRedownload;
+        private System.Windows.Forms.Button btnConsoleMode;
+        private System.Windows.Forms.Label lblQLaunch;
+        private System.Windows.Forms.Button btnQuit;
     }
 }
