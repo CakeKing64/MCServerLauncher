@@ -35,7 +35,7 @@ namespace MCServerLauncher
             Font fnt = new Font("Consolas", 8); 
             foreach (KeyValuePair<string,SPropSetting> KVP in sprop.ServerVars)
             {
-                if (KVP.Value != null)
+                if (KVP.Value.value != null)
                 {
                     var tbNewBox = new TextBox();
                     tbNewBox.Text = KVP.Key;
@@ -131,8 +131,9 @@ namespace MCServerLauncher
         {
             if (Modify)
             {
-                
-                e.Cancel = prevent_close(); 
+
+                e.Cancel = prevent_close();
+                return;
             }
 
 
@@ -153,12 +154,12 @@ namespace MCServerLauncher
                     valcheck = (CheckBox)values[p];
                     valcheck.Dispose();
                 }
-
+                tb.Dispose();
                 p++;
             }
             
-            foreach (TextBox tb in keys)
-                tb.Dispose();
+            //foreach (TextBox tb in keys)
+                
 
         }
 

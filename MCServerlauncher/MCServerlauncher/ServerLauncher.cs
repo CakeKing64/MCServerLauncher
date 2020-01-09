@@ -23,10 +23,13 @@ namespace MCServerLauncher
         public ServerLauncher()
         {
             InitializeComponent();
-            lbVersion.Items.Add("Latest");
+
 
             if (Program.sQLaunchSType == "Vanilla")
+            {
+                lbVersion.Items.Add("Latest");
                 clbSType.SetItemChecked(0, true);
+            }
             else
                 clbSType.SetItemChecked(1, true);
             tbVersion.Text = Program.sQLaunchSVersion;
@@ -180,6 +183,7 @@ namespace MCServerLauncher
         private void GetVersions(string stype)
         {
             lbVersion.Items.Clear();
+            if(stype == "Vanilla")
             lbVersion.Items.Add("Latest");
             if (!Directory.Exists("Servers"))
                 Directory.CreateDirectory("Servers");

@@ -37,7 +37,7 @@
             // 
             // btnSave
             // 
-            this.btnSave.Location = new System.Drawing.Point(383, 12);
+            this.btnSave.Location = new System.Drawing.Point(437, 12);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(75, 23);
             this.btnSave.TabIndex = 0;
@@ -47,7 +47,7 @@
             // 
             // btnExit
             // 
-            this.btnExit.Location = new System.Drawing.Point(465, 12);
+            this.btnExit.Location = new System.Drawing.Point(518, 12);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(75, 23);
             this.btnExit.TabIndex = 1;
@@ -57,16 +57,16 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(383, 51);
+            this.textBox1.Location = new System.Drawing.Point(437, 44);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(131, 20);
+            this.textBox1.Size = new System.Drawing.Size(156, 20);
             this.textBox1.TabIndex = 2;
             this.textBox1.TextChanged += new System.EventHandler(this.TextBox1_TextChanged);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(333, 54);
+            this.label1.Location = new System.Drawing.Point(387, 47);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(44, 13);
             this.label1.TabIndex = 3;
@@ -77,7 +77,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
-            this.ClientSize = new System.Drawing.Size(562, 622);
+            this.ClientSize = new System.Drawing.Size(617, 622);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.btnExit);

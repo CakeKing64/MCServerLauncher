@@ -145,6 +145,17 @@ namespace MCServerLauncher
             }
             if (sJavaPath == null)
             {
+                try
+                {
+                    if (Directory.Exists("C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"))
+                        if (File.Exists("C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"))
+                        {
+                            sJavaPath = "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath";
+                            goto _java_check_end;
+                        }
+
+                } catch(Exception e)
+                { }
                 string path = Environment.GetEnvironmentVariable("Path");
                
                 string[] paths = path.Split(';');
@@ -219,6 +230,7 @@ namespace MCServerLauncher
                         sJavaPath = jpath + "\\";
                     }
                 }
+                _java_check_end:
                 SaveSettings();
             }
             Console.Clear();
@@ -647,7 +659,7 @@ namespace MCServerLauncher
         public int type = 0;
         // Types:
         // 0 : String
-        // 1 : Int
+        // 1 : Int <-- not really used atm, pretty much just string. Best to use it if just incase I find a use for it.
         // 2 : Boolean
 
         public SPropSetting(string value, int type)
@@ -665,6 +677,7 @@ namespace MCServerLauncher
 
         public ServerProperties()
         {
+            ServerVars["announce-player-achievements"] = new SPropSetting(null, 1);
             ServerVars["allow-flight"] = new SPropSetting("false",2);
             ServerVars["allow-nether"] = new SPropSetting("true",2);
             ServerVars["broadcast-console-to-ops"] = new SPropSetting("true", 2);
@@ -700,6 +713,7 @@ namespace MCServerLauncher
             ServerVars["rcon.password"] = new SPropSetting("", 0);
             ServerVars["resource-pack"] = new SPropSetting(null,0);         // Set to null because some older servers use texture packs
             ServerVars["resource-pack-sha1"] = new SPropSetting(null,0);
+            ServerVars["resource-pack-hash"] = new SPropSetting(null, 0);
             ServerVars["server-ip"] = new SPropSetting("",0);
             ServerVars["server-port"] = new SPropSetting("25565",1);
             ServerVars["snooper-enabled"] = new SPropSetting("true",2);
