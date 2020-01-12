@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{454B6306-88EC-4564-8A6B-79B791DFABE4}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>MCServerlauncher</RootNamespace>
-    <AssemblyName>MCServerlauncher</AssemblyName>
+    <RootNamespace>MCServerLauncher</RootNamespace>
+    <AssemblyName>MCServerLauncher</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

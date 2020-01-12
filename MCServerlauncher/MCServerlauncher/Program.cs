@@ -107,6 +107,18 @@ namespace MCServerLauncher
             return job[get] != null ? job[get].ToString() : def;
         }
 
+        public static void TryLaunch(string stype, string version)
+        {
+            switch (stype.ToLower())
+            {
+                case "vanilla":
+                    start_server_vanilla(version, false);
+                    break;
+                case "spigot":
+                    start_server_spigot(version, false);
+                    break;
+            }
+        }
         [STAThread]
         static void Main(string[] args)
         {
@@ -271,7 +283,71 @@ namespace MCServerLauncher
                 SaveSettings();
 
             }
-            if(bUseGUI)
+
+            var sLV = "";
+            bool sLVWait = false;
+            var sLT = "";
+            bool sLTWait = false;
+            bool args_ = false;
+            foreach(string arg in args)
+            {
+                if (arg == "-help" || arg == "-?")
+                {
+                    Console.WriteLine("Commands:\n-help / -? : Shows this text\n-quicklaunch / -ql : Activates Quicklaunch on startup\n-version / -v : Sets version (must be combined with -stype)\n-stype / -st : Server type (Vanilla/Spigot)");
+                    Console.WriteLine("Press any key to continue");
+                    Console.ReadKey();
+                    args_ = true;
+                }
+
+                if (arg == "-quicklaunch" || arg == "-ql")
+                {
+                    launch(sQLaunchSType, sQLaunchSVersion);
+                    args_ = true;
+                }
+
+                if(sLVWait)
+                {
+                    sLVWait = false;
+                    sLV = arg;
+                    Console.WriteLine(arg);
+                    if (sLV != "" && sLT != "")
+                    {
+                        TryLaunch(sLT, sLV);
+                    }
+                    args_ = true;
+                }
+                if(arg == "-version" || arg == "-v")
+                {
+                    sLVWait = true;
+                    args_ = true;
+                }
+
+                if (sLTWait)
+                {
+                    sLTWait = false;
+                    sLT = arg;
+                    if (sLV != "" && sLT != "")
+                    {
+                        TryLaunch(sLT,sLV);
+                    }
+                    args_ = true;
+                }
+                if (arg == "-stype" || arg == "-st")
+                {
+                    sLTWait = true;
+                    args_ = true;
+                }
+
+
+            }
+            if (args_)
+            {
+                //Console.WriteLine("Press any key to exit");
+                //Console.ReadKey();
+                Environment.Exit(1);
+            }
+
+            if (bUseGUI)
             {
                 var conHandle = GetConsoleWindow();
                 ShowWindow(conHandle, SW_HIDE);
