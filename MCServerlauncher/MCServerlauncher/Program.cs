@@ -39,6 +39,7 @@ namespace MCServerLauncher
         public static bool bUseGUI = false;
         public static bool bFirstStart = true;
         public static bool bCloseOnServerLaunch = false;
+        public static bool bUseGlobalLaunchArgs = false;
 
         static string GetLatest()
         {
@@ -52,11 +53,21 @@ namespace MCServerLauncher
                 Console.WriteLine("Unable to launch " + stype + " / " + vnumb);
                 return;
             }
+
+            if (!File.Exists("Servers/" + stype + "/" + vnumb + "/server.json"))
+            {
+                var set = new JObject();
+                set["sLaunchArgs"] = "-Xmx1024M -Xms1024M -jar server.jar nogui";
+                File.WriteAllText("Servers/" + stype + "/" + vnumb + "/server.json", set.ToString());
+            }
+            var job = JObject.Parse(File.ReadAllText("Servers/" + stype + "/" + vnumb + "/server.json"));
+
+
             sQLaunchSType = stype;
             sQLaunchSVersion = vnumb;
             SaveSettings();
             Directory.SetCurrentDirectory("Servers/" + stype + "/" + vnumb);
-            ProcessStartInfo a = new ProcessStartInfo(sJavaPath + "/java.exe", sLaunchArgs);
+            ProcessStartInfo a = new ProcessStartInfo(sJavaPath + "/java.exe", job["sLaunchArgs"].ToString());
            // a.RedirectStandardOutput = true;
            //a.UseShellExecute = false;
             System.Diagnostics.Process.Start(a);

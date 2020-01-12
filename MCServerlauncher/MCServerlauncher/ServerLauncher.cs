@@ -123,10 +123,13 @@ namespace MCServerLauncher
             }
             else
             {
-                var pe = new PropertiesEditor("Servers/" + clbSType.CheckedItems[0].ToString() + "/" + lbVersion.Text);
-                pe.Text = "Properties Editor - " + (clbSType.CheckedItems[0].ToString()) + " " + tbVersion.Text;
+                PropertiesEditor pe = new PropertiesEditor("Servers/" + clbSType.CheckedItems[0].ToString() + "/" + lbVersion.Text)
+                {
+                    Text = "Properties Editor - " + (clbSType.CheckedItems[0].ToString()) + " " + tbVersion.Text
+                };
                 pe.ShowDialog();
                 pe.Dispose();
+                pe = null;
             }
         }
 
