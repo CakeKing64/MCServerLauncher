@@ -44,6 +44,7 @@
             this.btnConsoleMode = new System.Windows.Forms.Button();
             this.lblQLaunch = new System.Windows.Forms.Label();
             this.btnQuit = new System.Windows.Forms.Button();
+            this.btnManageWorlds = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnLaunch
@@ -210,11 +211,23 @@
             this.btnQuit.UseVisualStyleBackColor = false;
             this.btnQuit.Click += new System.EventHandler(this.BtnQuit_Click);
             // 
+            // btnManageWorlds
+            // 
+            this.btnManageWorlds.Location = new System.Drawing.Point(358, 54);
+            this.btnManageWorlds.Name = "btnManageWorlds";
+            this.btnManageWorlds.Size = new System.Drawing.Size(124, 36);
+            this.btnManageWorlds.TabIndex = 17;
+            this.btnManageWorlds.Text = "Manage Worlds";
+            this.btnManageWorlds.UseVisualStyleBackColor = true;
+            this.btnManageWorlds.Visible = false;
+            this.btnManageWorlds.Click += new System.EventHandler(this.BtnManageWorlds_Click);
+            // 
             // ServerLauncher
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnManageWorlds);
             this.Controls.Add(this.btnQuit);
             this.Controls.Add(this.lblQLaunch);
             this.Controls.Add(this.btnConsoleMode);
@@ -257,5 +270,6 @@
         private System.Windows.Forms.Button btnConsoleMode;
         private System.Windows.Forms.Label lblQLaunch;
         private System.Windows.Forms.Button btnQuit;
+        private System.Windows.Forms.Button btnManageWorlds;
     }
 }

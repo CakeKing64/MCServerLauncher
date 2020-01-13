@@ -41,6 +41,7 @@ namespace MCServerLauncher
 
             lblQLaunch.Text = Program.sQLaunchSType + " / " + Program.sQLaunchSVersion;
             lblQLaunch.Show();
+            btnManageWorlds.Top = 12;
         }
 
         private void Button1_Click(object sender, EventArgs e)
@@ -235,6 +236,7 @@ namespace MCServerLauncher
             btnLaunchS.Show();
             btnReturn.Show();
             btnQuit.Hide();
+            btnManageWorlds.Show();
             bModifyProp = true;
         }
 
@@ -245,7 +247,7 @@ namespace MCServerLauncher
             btnLaunch.Show();
             btnConsoleMode.Show();
             lblInstalled.Hide();
-
+            btnManageWorlds.Hide();
             clbSType.Hide();
             lbVersion.Hide();
             tbVersion.Hide();
@@ -305,6 +307,7 @@ namespace MCServerLauncher
 
 
                 btnRedownload.Enabled = Directory.Exists("Servers/" + clbSType.CheckedItems[0].ToString() + "/" + TextBoxv.Text);
+                btnManageWorlds.Enabled = Directory.Exists("Servers/" + clbSType.CheckedItems[0].ToString() + "/" + TextBoxv.Text);
             }
                 
         }
@@ -345,6 +348,12 @@ namespace MCServerLauncher
         private void ServerLauncher_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void BtnManageWorlds_Click(object sender, EventArgs e)
+        {
+            var WM = new WorldMod("Servers/" + clbSType.CheckedItems[0].ToString() + "/" + tbVersion.Text);
+            WM.ShowDialog();
         }
     }
 
