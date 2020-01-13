@@ -352,7 +352,7 @@ namespace MCServerLauncher
 
         private void BtnManageWorlds_Click(object sender, EventArgs e)
         {
-            var WM = new WorldMod("Servers/" + clbSType.CheckedItems[0].ToString() + "/" + tbVersion.Text);
+            var WM = new WorldMod("Servers\\" + clbSType.CheckedItems[0].ToString() + "\\" + tbVersion.Text);
             WM.ShowDialog();
         }
     }

@@ -37,6 +37,8 @@
             this.btnRefresh = new System.Windows.Forms.Button();
             this.lblDnD = new System.Windows.Forms.Label();
             this.lblCurrent = new System.Windows.Forms.Label();
+            this.btnExit = new System.Windows.Forms.Button();
+            this.btnOpen = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lstWorlds
@@ -49,6 +51,7 @@
             this.lstWorlds.TabIndex = 0;
             this.lstWorlds.SelectedIndexChanged += new System.EventHandler(this.LstWorlds_SelectedIndexChanged);
             this.lstWorlds.DragDrop += new System.Windows.Forms.DragEventHandler(this.LstWorlds_DragDrop);
+            this.lstWorlds.DragEnter += new System.Windows.Forms.DragEventHandler(this.LstWorlds_DragEnter);
             // 
             // lstBackups
             // 
@@ -97,17 +100,18 @@
             // btnDelete
             // 
             this.btnDelete.AllowDrop = true;
-            this.btnDelete.Location = new System.Drawing.Point(218, 153);
+            this.btnDelete.Location = new System.Drawing.Point(218, 181);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(119, 23);
             this.btnDelete.TabIndex = 5;
             this.btnDelete.Text = "Delete";
             this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.BtnDelete_Click);
             // 
             // btnRefresh
             // 
             this.btnRefresh.AllowDrop = true;
-            this.btnRefresh.Location = new System.Drawing.Point(218, 331);
+            this.btnRefresh.Location = new System.Drawing.Point(218, 304);
             this.btnRefresh.Name = "btnRefresh";
             this.btnRefresh.Size = new System.Drawing.Size(119, 23);
             this.btnRefresh.TabIndex = 6;
@@ -134,12 +138,36 @@
             this.lblCurrent.TabIndex = 8;
             this.lblCurrent.Text = "Current World: ???";
             // 
+            // btnExit
+            // 
+            this.btnExit.AllowDrop = true;
+            this.btnExit.Location = new System.Drawing.Point(218, 331);
+            this.btnExit.Name = "btnExit";
+            this.btnExit.Size = new System.Drawing.Size(119, 23);
+            this.btnExit.TabIndex = 9;
+            this.btnExit.Text = "Exit";
+            this.btnExit.UseVisualStyleBackColor = true;
+            this.btnExit.Click += new System.EventHandler(this.BtnExit_Click);
+            // 
+            // btnOpen
+            // 
+            this.btnOpen.AllowDrop = true;
+            this.btnOpen.Location = new System.Drawing.Point(218, 152);
+            this.btnOpen.Name = "btnOpen";
+            this.btnOpen.Size = new System.Drawing.Size(119, 23);
+            this.btnOpen.TabIndex = 10;
+            this.btnOpen.Text = "Open in explorer";
+            this.btnOpen.UseVisualStyleBackColor = true;
+            this.btnOpen.Click += new System.EventHandler(this.BtnOpen_Click);
+            // 
             // WorldMod
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(554, 450);
+            this.Controls.Add(this.btnOpen);
+            this.Controls.Add(this.btnExit);
             this.Controls.Add(this.lblCurrent);
             this.Controls.Add(this.lblDnD);
             this.Controls.Add(this.btnRefresh);
@@ -150,6 +178,7 @@
             this.Controls.Add(this.lstBackups);
             this.Controls.Add(this.lstWorlds);
             this.Name = "WorldMod";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "World Manager";
             this.Load += new System.EventHandler(this.WorldMod_Load);
             this.DragDrop += new System.Windows.Forms.DragEventHandler(this.WorldMod_DragDrop);
@@ -170,5 +199,7 @@
         private System.Windows.Forms.Button btnRefresh;
         private System.Windows.Forms.Label lblDnD;
         private System.Windows.Forms.Label lblCurrent;
+        private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.Button btnOpen;
     }
 }
