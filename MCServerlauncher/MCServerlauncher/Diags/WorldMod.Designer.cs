@@ -39,6 +39,7 @@
             this.lblCurrent = new System.Windows.Forms.Label();
             this.btnExit = new System.Windows.Forms.Button();
             this.btnOpen = new System.Windows.Forms.Button();
+            this.btnRename = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lstWorlds
@@ -153,7 +154,7 @@
             // btnOpen
             // 
             this.btnOpen.AllowDrop = true;
-            this.btnOpen.Location = new System.Drawing.Point(218, 152);
+            this.btnOpen.Location = new System.Drawing.Point(218, 275);
             this.btnOpen.Name = "btnOpen";
             this.btnOpen.Size = new System.Drawing.Size(119, 23);
             this.btnOpen.TabIndex = 10;
@@ -161,12 +162,23 @@
             this.btnOpen.UseVisualStyleBackColor = true;
             this.btnOpen.Click += new System.EventHandler(this.BtnOpen_Click);
             // 
+            // btnRename
+            // 
+            this.btnRename.Location = new System.Drawing.Point(218, 152);
+            this.btnRename.Name = "btnRename";
+            this.btnRename.Size = new System.Drawing.Size(119, 23);
+            this.btnRename.TabIndex = 11;
+            this.btnRename.Text = "Rename";
+            this.btnRename.UseVisualStyleBackColor = true;
+            this.btnRename.Click += new System.EventHandler(this.BtnRename_Click);
+            // 
             // WorldMod
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(554, 450);
+            this.Controls.Add(this.btnRename);
             this.Controls.Add(this.btnOpen);
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.lblCurrent);
@@ -202,5 +214,6 @@
         private System.Windows.Forms.Label lblCurrent;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Button btnOpen;
+        private System.Windows.Forms.Button btnRename;
     }
 }

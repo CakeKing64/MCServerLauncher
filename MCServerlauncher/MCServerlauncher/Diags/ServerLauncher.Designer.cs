@@ -298,6 +298,7 @@
             this.Controls.Add(this.btnLaunch);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ServerLauncher";
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "Server Launcher";
             this.Load += new System.EventHandler(this.ServerLauncher_Load);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ServerLauncher_KeyPress);

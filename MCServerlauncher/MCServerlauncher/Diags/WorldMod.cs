@@ -111,7 +111,6 @@ namespace MCServerLauncher
             {
                 ZipArchive za = ZipFile.Open(fileList[0], ZipArchiveMode.Read);
                 var tempp = Path.GetTempPath() + "MCServerLauncher";
-                MessageBox.Show(tempp);
                 if (!Directory.Exists(tempp))
                     Directory.CreateDirectory(tempp);
 
@@ -268,7 +267,7 @@ namespace MCServerLauncher
 
             if (Directory.Exists(svdir + "\\world_backups\\" + worldn))
             {
-                DialogResult res = MessageBox.Show("World already exists in backup, would you like to override it?", "World already exists", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                DialogResult res = MessageBox.Show("World already exists in backups, would you like to override it?", "World already exists", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
 
                 if (res == DialogResult.Yes)
                 {
@@ -356,7 +355,7 @@ namespace MCServerLauncher
 
             if (Directory.Exists(svdir + "\\world_backups\\" + worldn))
             {
-                DialogResult res = MessageBox.Show("World already exists in backup, would you like to override it?", "World already exists", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                DialogResult res = MessageBox.Show("World already exists in backups, would you like to override it?", "World already exists", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
 
                 if (res == DialogResult.Yes)
                 {
@@ -459,6 +458,33 @@ namespace MCServerLauncher
                 foreach (object obj in lstBackups.SelectedItems)
                     CopyFromBackups(obj.ToString());
             
+            RefreshWorlds();
+        }
+
+        static char[] invalidChars = Path.GetInvalidFileNameChars();
+        private void BtnRename_Click(object sender, EventArgs e)
+        {
+            if (!BackupMode ? lstWorlds.SelectedIndex == -1 : lstBackups.SelectedIndex == -1)
+            {
+                MessageBox.Show("Please select a world first!");
+                return;
+            }
+            var dgr = new Diags.diagRename(!BackupMode ? lstWorlds.SelectedItems[0].ToString() : lstBackups.SelectedItems[0].ToString());
+                    dgr.ShowDialog();
+                    if (dgr.cancel)
+                        return;
+                if (dgr.name == (!BackupMode ? lstWorlds.SelectedItems[0].ToString() : lstBackups.SelectedItems[0].ToString()))
+                    return;
+                if(dgr.name.IndexOfAny(invalidChars) != -1)
+                {
+                    MessageBox.Show("Inavlid world name!");
+                    return;
+                }
+
+                if (Directory.Exists(svdir + "/" + dgr.name))
+                    MessageBox.Show("World with name \"" + dgr.name + "\" already exists!");
+                
+                Directory.Move(svdir + "/" + (BackupMode ? "world_backups//" + lstBackups.SelectedItems[0].ToString() : lstWorlds.SelectedItems[0].ToString()) , svdir + "/" + (BackupMode ? "world_backups//" : "") + dgr.name);
             RefreshWorlds();
         }
     }
