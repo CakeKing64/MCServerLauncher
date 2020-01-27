@@ -137,6 +137,7 @@ namespace MCServerLauncher
             }
 
 
+            /*
             int p = 0;
             foreach (TextBox tb in keys)
             {
@@ -157,7 +158,7 @@ namespace MCServerLauncher
                 tb.Dispose();
                 p++;
             }
-            
+            */
             //foreach (TextBox tb in keys)
                 
 

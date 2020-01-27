@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WorldMod));
             this.lstWorlds = new System.Windows.Forms.ListBox();
             this.lstBackups = new System.Windows.Forms.ListBox();
             this.btnMoveBack = new System.Windows.Forms.Button();
@@ -190,6 +191,7 @@
             this.Controls.Add(this.btnMoveBack);
             this.Controls.Add(this.lstBackups);
             this.Controls.Add(this.lstWorlds);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "WorldMod";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.Text = "World Manager";
