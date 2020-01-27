@@ -188,31 +188,6 @@ namespace MCServerLauncher
         }
 
 
-        void THANOS_SNAP(string dir)
-        {
-
-            foreach (string file in Directory.GetFiles(dir))
-                File.Delete(file);
-            foreach (string sdir in Directory.GetDirectories(dir))
-            {
-                THANOS_SNAP(sdir);
-                Directory.Delete(sdir);
-            }
-
-        }
-        void CLONE_DIRECTORY(string inDir, string toDir)
-        {
-            Directory.CreateDirectory(toDir);
-            foreach (string file in Directory.GetFiles(inDir))
-            {
-                File.Copy(file,toDir + "\\" + Path.GetFileName(file));
-            }
-            foreach (string dir in Directory.GetDirectories(inDir))
-            {
-                string outdir = toDir + "\\" + Path.GetFileName(dir);
-                CLONE_DIRECTORY(dir, outdir);
-            }
-        }
         private void BtnDelete_Click(object sender, EventArgs e)
         {
             
@@ -235,7 +210,7 @@ namespace MCServerLauncher
                 {
                     foreach (object obj in lstWorlds.SelectedItems)
                     {
-                        THANOS_SNAP(svdir + "/" + obj.ToString());
+                        Program.THANOS_SNAP(svdir + "/" + obj.ToString());
                         Directory.Delete(svdir + "/" + obj.ToString());
                     }
                 }
@@ -243,7 +218,7 @@ namespace MCServerLauncher
                 {
                     foreach (object obj in lstBackups.SelectedItems)
                     {
-                        THANOS_SNAP(svdir + "/world_backups/" + obj.ToString());
+                        Program.THANOS_SNAP(svdir + "/world_backups/" + obj.ToString());
                         Directory.Delete(svdir + "/world_backups/" + obj.ToString());
                     }
                 }
@@ -297,7 +272,7 @@ namespace MCServerLauncher
 
                 if (res == DialogResult.Yes)
                 {
-                    THANOS_SNAP(svdir + "\\world_backups\\" + worldn);
+                    Program.THANOS_SNAP(svdir + "\\world_backups\\" + worldn);
                     ovr = 2; // 2 is unused but it looks like i'm doing work :)
                 }
                 if (res == DialogResult.No)
@@ -341,7 +316,7 @@ namespace MCServerLauncher
 
                 if (res == DialogResult.Yes)
                 {
-                    THANOS_SNAP(svdir + "\\" + worldn);
+                    Program.THANOS_SNAP(svdir + "\\" + worldn);
                     ovr = 2; // 2 is unused but it looks like i'm doing work :)
                 }
                 if (res == DialogResult.No)
@@ -385,7 +360,7 @@ namespace MCServerLauncher
 
                 if (res == DialogResult.Yes)
                 {
-                    THANOS_SNAP(svdir + "\\world_backups\\" + worldn);
+                    Program.THANOS_SNAP(svdir + "\\world_backups\\" + worldn);
                     ovr = 2; // 2 is unused but it looks like i'm doing work :)
                 }
                 if (res == DialogResult.No)
@@ -414,7 +389,7 @@ namespace MCServerLauncher
             if (Directory.Exists(svdir + "\\" + worldn + "_the_end"))
                 CLONE_DIRECTORY(svdir + "\\" + worldn + "_the_end", svdir + "\\world_backups\\" + worldx + "_the_end");
                 */
-            CLONE_DIRECTORY(svdir + "\\" + worldn,svdir + "\\world_backups\\" + worldx);
+            Program.CLONE_DIRECTORY(svdir + "\\" + worldn,svdir + "\\world_backups\\" + worldx);
         }
         private void CopyFromBackups(string worldn)
         {
@@ -428,7 +403,7 @@ namespace MCServerLauncher
 
                 if (res == DialogResult.Yes)
                 {
-                    THANOS_SNAP(svdir + "\\" + worldn);
+                    Program.THANOS_SNAP(svdir + "\\" + worldn);
                     ovr = 2; // 2 is unused but it looks like i'm doing work :)
                 }
                 if (res == DialogResult.No)
@@ -458,7 +433,7 @@ namespace MCServerLauncher
             if (Directory.Exists(svdir + "\\" + worldn + "_the_end"))
                 CLONE_DIRECTORY(svdir + "\\" + worldn + "_the_end", svdir + "\\world_backups\\" + worldx + "_the_end");
                 */
-            CLONE_DIRECTORY(svdir + "\\world_backups\\" + worldn, svdir + "\\" + worldx);
+            Program.CLONE_DIRECTORY(svdir + "\\world_backups\\" + worldn, svdir + "\\" + worldx);
 
         }
         #endregion

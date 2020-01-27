@@ -115,8 +115,8 @@ namespace MCServerLauncher
 
             if(tbVersion.Text == "Timotainment")
             {
-                ProcessStartInfo a = new ProcessStartInfo("explorer", "www.youtube.com/embed/CBb2AsiFhsA");
-                System.Diagnostics.Process.Start(a);
+                ProcessStartInfo a = new ProcessStartInfo("explorer", "https://www.youtube.com/embed/CBb2AsiFhsA");
+                Process.Start(a);
                 return;
             }
 
@@ -131,6 +131,15 @@ namespace MCServerLauncher
                         GetVersions("Vanilla");
                         break;
                     case "Spigot":
+                        /*
+                        if(!Program.bAskedGit)
+                        {
+                            DialogResult dg = MessageBox.Show("Git is highly reccomended when downloading spigot servers, would you like to open the page to download Git?", "Download Git?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                            if (dg == DialogResult.Yes)
+                                Process.Start("explorer", "https://gitforwindows.org/");
+                            Program.bAskedGit = true;
+                        }
+                        */
                         Program.start_server_spigot(tbVersion.Text, false);
                         GetVersions("Spigot");
                         break;
@@ -145,7 +154,6 @@ namespace MCServerLauncher
                 };
                 pe.ShowDialog();
                 pe.Dispose();
-                pe = null;
             }
         }
 

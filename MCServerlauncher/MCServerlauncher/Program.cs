@@ -52,7 +52,7 @@ namespace MCServerLauncher
         public static bool bFirstStart = true;
         public static bool bCloseOnServerLaunch = false;
         public static bool bUseGlobalLaunchArgs = false;
-
+        public static bool bAskedGit = false;
         static string GetLatest()
         {
             return sLatestVersion;
@@ -122,6 +122,7 @@ namespace MCServerLauncher
             job["bUseGUI"] = bUseGUI;
             job["bCloseOnServerLaunch"] = bCloseOnServerLaunch;
             job["bFirstStart"] = bFirstStart;
+            //job["bAskedGit"] = bAskedGit;
             File.WriteAllText("settings.json", job.ToString());
         }
 
@@ -175,6 +176,7 @@ namespace MCServerLauncher
                 bUseGUI = job["bUseGUI"] != null ? bool.Parse(job["bUseGUI"].ToString()) : false;
                 bCloseOnServerLaunch = job["bCloseOnServerLaunch"] != null ? bool.Parse(job["bCloseOnServerLaunch"].ToString()) : false;
                 bFirstStart = job["bFirstStart"] != null ? bool.Parse(job["bFirstStart"].ToString()) : true;
+                //bAskedGit = job["bAskedGit"] != null ? bool.Parse(job["bAskedGit"].ToString()) : false;
             }
           
             // imma just put this in here so i don't feel bad/what ever
@@ -760,10 +762,13 @@ namespace MCServerLauncher
             {
                 Directory.CreateDirectory("BuildTools");
             }
-            if (!File.Exists("BuildTools/BuildTools.jar"))
+            if (!Directory.Exists("BuildTools/" + version))
+                Directory.CreateDirectory("BuildTools/" + version);
+
+            if (!File.Exists("BuildTools/" + version + "/BuildTools.jar"))
             {
                 Console.WriteLine("Downloading BuildTools...");
-                client.DownloadFile("https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar", "BuildTools/BuildTools.jar");
+                client.DownloadFile("https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar", "BuildTools/" + version + "/BuildTools.jar");
                 Console.Clear();
             }
 
@@ -789,27 +794,72 @@ namespace MCServerLauncher
             
                 if (!Directory.Exists("Servers/Spigot/" + ver) || !File.Exists("Servers/Spigot/" + ver + "/server.jar"))
             {
-                Directory.SetCurrentDirectory("BuildTools");
-
+                Directory.SetCurrentDirectory("BuildTools/" + ver);
+                if (Directory.Exists("BuildData"))
+                {
+                    THANOS_SNAP("BuildData");
+                }
                 ProcessStartInfo a = new ProcessStartInfo(sJavaPath + "/java", "-jar BuildTools.jar --rev " + ver);
                 
                 Process prc = System.Diagnostics.Process.Start(a);
                 Console.WriteLine("Please wait for the download/compilation to complete, this may take a while...");
                 prc.WaitForExit();
-                Directory.SetCurrentDirectory("../");
+                Directory.SetCurrentDirectory("../../");
 
                 if (!Directory.Exists("Servers/Spigot"))
                     Directory.CreateDirectory("Servers/Spigot");
 
                 Directory.CreateDirectory("Servers/Spigot/" + ver);
-                File.Move("BuildTools/spigot-" + ver + ".jar", "Servers/Spigot/" + ver + "/server.jar");
+                try
+                {
+                    File.Move("BuildTools/" + ver + "/spigot-" + ver + ".jar", "Servers/Spigot/" + ver + "/server.jar");
+                } catch
+                {
+                    MessageBox.Show("Failed to download file, please delete the \"BuildTools\\" + ver + "\" directory and try again");
+                    return;
+                }
             }
 
             if(!File.Exists("Servers/Spigot/" + ver + "/eula.txt")) File.WriteAllText("Servers/Spigot/" + ver + "/eula.txt", "eula=" + bReadEULA.ToString().ToLower());
             if (!File.Exists("Servers/Spigot/" + ver + "/server.properties")) File.WriteAllText("Servers/Spigot/" + ver + "/server.properties", new ServerProperties().ToString());
             launch("Spigot", ver);
         }
-    #endregion
+        #endregion
+
+
+
+
+
+
+        public static void THANOS_SNAP(string dir)
+        {
+
+            try
+            {
+                foreach (string file in Directory.GetFiles(dir))
+                    File.Delete(file);
+                foreach (string sdir in Directory.GetDirectories(dir))
+                {
+                    THANOS_SNAP(sdir);
+                    Directory.Delete(sdir);
+                }
+            }
+            catch
+            { }
+        }
+        public static void CLONE_DIRECTORY(string inDir, string toDir)
+        {
+            Directory.CreateDirectory(toDir);
+            foreach (string file in Directory.GetFiles(inDir))
+            {
+                File.Copy(file, toDir + "\\" + Path.GetFileName(file));
+            }
+            foreach (string dir in Directory.GetDirectories(inDir))
+            {
+                string outdir = toDir + "\\" + Path.GetFileName(dir);
+                CLONE_DIRECTORY(dir, outdir);
+            }
+        }
     }
 
 
