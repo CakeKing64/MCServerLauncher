@@ -18,6 +18,18 @@ namespace MCServerLauncher
     class Program
     {
 
+        public static WebClient client = new WebClient(); // For downloading the json files
+
+
+        public static int DownloadPos = 0;
+        public static bool DownloadComplete = false;
+        public static bool DownloadingServer = false;
+        public static int GetDownloadPos()
+        {
+            return DownloadPos;
+        }
+
+
         [DllImport("kernel32.dll")]
         static extern IntPtr GetConsoleWindow();
 
@@ -32,7 +44,7 @@ namespace MCServerLauncher
         public static bool bUseSingleDirectory = false;
         public static string sLatestVersion = "1.0";
         public static bool bReadEULA = false;
-        public static string sLaunchArgs = "-Xmx1024M -Xms1024M -jar server.jar nogui";
+        public static string sLaunchArgs = "-Xmx1024M -Xms1024M -jar server.jar";
         public static string sQLaunchSType = "Vanilla";
         public static string sQLaunchSVersion = "1.0";
         public static string sJavaPath = null;
@@ -48,7 +60,18 @@ namespace MCServerLauncher
         [STAThread]
         public static void launch(string stype, string vnumb)
         {
-            if (!Directory.Exists("Servers/" + stype + "/"  + vnumb) || !File.Exists("Servers/" + stype + "/" + vnumb + "/server.jar"))
+            bool has_jar = false;
+            if (Directory.Exists("Servers/" + stype + "/" + vnumb))
+                {
+                
+                string[] files = Directory.GetFiles(GetSDV() + vnumb);
+                foreach (string file in files)
+                {
+                    if (Path.GetExtension(file) == ".jar")
+                        has_jar = true;
+                }
+            }
+            if (!Directory.Exists("Servers/" + stype + "/"  + vnumb) && has_jar)
             {
                 Console.WriteLine("Unable to launch " + stype + " / " + vnumb);
                 return;
@@ -57,7 +80,7 @@ namespace MCServerLauncher
             if (!File.Exists("Servers/" + stype + "/" + vnumb + "/server.json"))
             {
                 var set = new JObject();
-                set["sLaunchArgs"] = "-Xmx1024M -Xms1024M -jar server.jar nogui";
+                set["sLaunchArgs"] = "-Xmx1024M -Xms1024M -jar server.jar";
                 File.WriteAllText("Servers/" + stype + "/" + vnumb + "/server.json", set.ToString());
             }
             var job = JObject.Parse(File.ReadAllText("Servers/" + stype + "/" + vnumb + "/server.json"));
@@ -119,12 +142,22 @@ namespace MCServerLauncher
                     break;
             }
         }
-        [STAThread]
+
+        public static void Client_DownloadProgressChanged(object sender, DownloadProgressChangedEventArgs e)
+        {
+          // Console.WriteLine("Downloading... " + e.ProgressPercentage + "% (" + e.BytesReceived / 1000 + "MB / " + e.TotalBytesToReceive / 1000 + "MB)");
+            //DownloadPos = e.ProgressPercentage;
+        }
+
+       [STAThread]
         static void Main(string[] args)
         {
 
             AppDomain.CurrentDomain.ProcessExit += new EventHandler(ProgramExit);
 
+            client.DownloadProgressChanged += Client_DownloadProgressChanged;
+            client.DownloadFileCompleted += Client_DownloadFileCompleted;
+           
 
             if (!File.Exists("settings.json"))
             {
@@ -177,7 +210,7 @@ namespace MCServerLauncher
                             goto _java_check_end;
                         }
 
-                } catch(Exception e)
+                } catch
                 { }
                 string path = Environment.GetEnvironmentVariable("Path");
                
@@ -434,6 +467,11 @@ namespace MCServerLauncher
 
         }
 
+        private static void Client_DownloadFileCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        {
+            DownloadComplete = true;
+        }
+
         public static void CheckServerF()
         {
             if (!Directory.Exists("Servers"))
@@ -491,12 +529,28 @@ namespace MCServerLauncher
 
         }
 
+
+        // UNUSED, might delete later idk ¯\_(ツ)_/¯
+       // static async void ShowDownloadBar()
+        //{
+            /*
+            var dp = new MCServerLauncher.Diags.DownloadPos();
+            dp.ShowDialog();
+            while (!DownloadComplete)
+            {
+                dp.pgbDownloadBar.Value = DownloadPos;
+            }
+            dp.Close();
+            dp.Dispose();
+            */
+       // }
+
         #region "Vanilla Server"
         public static void start_server_vanilla(string version, bool redownload)
         {
             bool bFoundVersion = false; // Found Version check
             bool bFoundServer = false;  // Found Server check
-            var client = new WebClient(); // For downloading the json files
+            
             var bUseLatest = false;
             string str = version;
             if (version == null)
@@ -520,7 +574,18 @@ namespace MCServerLauncher
             bUseLatest = str == "latest" || str == "Latest";
             if(redownload)
             File.Delete((GetSDV() + str + "/server.jar"));
-            if (Directory.Exists(GetSDV() + str) && File.Exists(GetSDV() + str + "/server.jar"))
+            bool has_jar = false;
+            if (Directory.Exists(GetSDV() + str))
+            {
+                has_jar = false;
+                string[] files = Directory.GetFiles(GetSDV() + str);
+                foreach (string file in files)
+                {
+                    if (Path.GetExtension(file) == ".jar")
+                        has_jar = true;
+                }
+            }
+            if (has_jar) // (File.Exists(GetSDV() + str + "/server.jar" ) || File.Exists(GetSDV() + str +  "/minecraft_server." + str + ".jar")
             {
                 launch("Vanilla",str);
 
@@ -632,7 +697,22 @@ namespace MCServerLauncher
                         client.OpenRead(check);
                         Int64 bytes_total = Convert.ToInt64(client.ResponseHeaders["Content-Length"]);
                         Console.Write("(" + (bytes_total / 1000000) + " MB)...");
-                        client.DownloadFile(check, GetSDV() + str + "/server.jar");
+                        client.DownloadFile(new Uri(check), GetSDV() + str + "/server.jar");
+                        /*
+                         * 
+                         * eh, idk about this one.
+                         * seems kinda pointless
+                        DownloadComplete = false;
+                        DownloadingServer = true;
+                        DownloadPos = 0;
+                        
+                        ShowDownloadBar();
+
+                        while(!DownloadComplete)
+                        { }
+                        */
+
+
                     }
                     catch
                     {
@@ -670,7 +750,7 @@ namespace MCServerLauncher
         #region "Spigot Server"
         public static void start_server_spigot(string version, bool redownload)
         {
-            var client = new WebClient(); // For downloading the json files
+            //var client = new WebClient(); // For downloading the json files
             var ver = "";
 
             ver = version;

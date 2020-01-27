@@ -40,6 +40,22 @@ namespace MCServerLauncher
                 if (dir_s == svp.ServerVars["level-name"].value)
                     lblCurrent.Text = "Current World: " + dir_s;
             }
+
+
+            if (!Directory.Exists(svdir + "/world_backups"))
+                Directory.CreateDirectory(svdir + "/world_backups");
+
+            dirs = Directory.GetDirectories(svdir + "/world_backups");
+
+            lstBackups.Items.Clear();
+
+            foreach (string dir in dirs)
+            {
+                var dir_s = dir.Substring(svdir.Length + 15);
+                if (File.Exists(dir + "/level.dat") && !dir_s.Contains("_the_end") && !dir.Contains("_nether"))
+                    lstBackups.Items.Add(dir_s);
+
+            }
         }
 
         private void WorldMod_Load(object sender, EventArgs e)
@@ -65,7 +81,7 @@ namespace MCServerLauncher
         }
 
         private void BtnCopy_Click(object sender, EventArgs e)
-        {
+        { 
 
         }
 
@@ -201,6 +217,19 @@ namespace MCServerLauncher
             var dir = "\"" + Directory.GetCurrentDirectory() + "\\" + svdir + "\\" + lstWorlds.Items[lstWorlds.SelectedIndex].ToString() + "\"";
             ProcessStartInfo a = new ProcessStartInfo("explorer", dir);
             System.Diagnostics.Process.Start(a);
+        }
+
+        private void BtnMoveBack_Click(object sender, EventArgs e)
+        {
+            var worldn = lstWorlds.Items[lstWorlds.SelectedIndex].ToString();
+            if (!Directory.Exists(svdir + "\\world_backups"))
+                Directory.CreateDirectory(svdir + "\\world_backups");
+                if(Directory.Exists(svdir + "\\" + worldn + "_nether"))
+                    Directory.Move(svdir + "\\" + worldn + "_nether", svdir + "\\world_backups\\" + worldn + "_nether");
+            if (Directory.Exists(svdir + "\\" + worldn + "_the_end"))
+                Directory.Move(svdir + "\\" + worldn + "_the_end", svdir + "\\world_backups\\" + worldn + "_the_end");
+
+                Directory.Move(svdir + "\\" + worldn, svdir + "\\world_backups\\" + worldn);
         }
     }
 }

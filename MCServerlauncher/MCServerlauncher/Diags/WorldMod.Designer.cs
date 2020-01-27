@@ -66,13 +66,13 @@
             // btnMoveBack
             // 
             this.btnMoveBack.AllowDrop = true;
-            this.btnMoveBack.Enabled = false;
             this.btnMoveBack.Location = new System.Drawing.Point(218, 64);
             this.btnMoveBack.Name = "btnMoveBack";
             this.btnMoveBack.Size = new System.Drawing.Size(119, 23);
             this.btnMoveBack.TabIndex = 2;
             this.btnMoveBack.Text = "Move to backups";
             this.btnMoveBack.UseVisualStyleBackColor = true;
+            this.btnMoveBack.Click += new System.EventHandler(this.BtnMoveBack_Click);
             // 
             // btnCopy
             // 
@@ -132,7 +132,7 @@
             // lblCurrent
             // 
             this.lblCurrent.AutoSize = true;
-            this.lblCurrent.Location = new System.Drawing.Point(12, 48);
+            this.lblCurrent.Location = new System.Drawing.Point(9, 39);
             this.lblCurrent.Name = "lblCurrent";
             this.lblCurrent.Size = new System.Drawing.Size(96, 13);
             this.lblCurrent.TabIndex = 8;

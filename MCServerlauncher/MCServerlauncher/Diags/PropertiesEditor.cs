@@ -221,18 +221,7 @@ namespace MCServerLauncher
 
         private void Button2_Click(object sender, EventArgs e)
         {
-            if (!File.Exists(sPropDir + "/server.json"))
-                {
-                var set = new JObject();
-                set["sLaunchArgs"] = "-Xmx1024M -Xms1024M -jar server.jar nogui";
-                File.WriteAllText(sPropDir + "/server.json", set.ToString());
-                }
-            var job = JObject.Parse(File.ReadAllText(sPropDir + "/server.json"));
-            var da = new diagArgs(job["sLaunchArgs"].ToString());
-            da.ShowDialog();
-            job["sLaunchArgs"] = da._args;
-            File.WriteAllText(sPropDir + "/server.json", job.ToString());
-            da.Dispose();
+
         }
     }
 }

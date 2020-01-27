@@ -45,6 +45,9 @@
             this.lblQLaunch = new System.Windows.Forms.Label();
             this.btnQuit = new System.Windows.Forms.Button();
             this.btnManageWorlds = new System.Windows.Forms.Button();
+            this.cbVersion = new System.Windows.Forms.ComboBox();
+            this.btnVersionList = new System.Windows.Forms.Button();
+            this.btnArgumentEditor = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnLaunch
@@ -75,7 +78,7 @@
             this.btnModifyProp.Name = "btnModifyProp";
             this.btnModifyProp.Size = new System.Drawing.Size(187, 36);
             this.btnModifyProp.TabIndex = 2;
-            this.btnModifyProp.Text = "Modi&fy Properties";
+            this.btnModifyProp.Text = "Modi&fy Server Settings";
             this.btnModifyProp.UseVisualStyleBackColor = false;
             this.btnModifyProp.Click += new System.EventHandler(this.BtnModifyProp_Click);
             // 
@@ -172,7 +175,7 @@
             // 
             this.btnRedownload.Location = new System.Drawing.Point(358, 12);
             this.btnRedownload.Name = "btnRedownload";
-            this.btnRedownload.Size = new System.Drawing.Size(124, 36);
+            this.btnRedownload.Size = new System.Drawing.Size(133, 36);
             this.btnRedownload.TabIndex = 13;
             this.btnRedownload.Text = "Re-Download";
             this.btnRedownload.UseVisualStyleBackColor = true;
@@ -215,18 +218,54 @@
             // 
             this.btnManageWorlds.Location = new System.Drawing.Point(358, 54);
             this.btnManageWorlds.Name = "btnManageWorlds";
-            this.btnManageWorlds.Size = new System.Drawing.Size(124, 36);
+            this.btnManageWorlds.Size = new System.Drawing.Size(133, 36);
             this.btnManageWorlds.TabIndex = 17;
             this.btnManageWorlds.Text = "Manage Worlds";
             this.btnManageWorlds.UseVisualStyleBackColor = true;
             this.btnManageWorlds.Visible = false;
             this.btnManageWorlds.Click += new System.EventHandler(this.BtnManageWorlds_Click);
             // 
+            // cbVersion
+            // 
+            this.cbVersion.FormattingEnabled = true;
+            this.cbVersion.Location = new System.Drawing.Point(538, 257);
+            this.cbVersion.Name = "cbVersion";
+            this.cbVersion.Size = new System.Drawing.Size(188, 21);
+            this.cbVersion.TabIndex = 18;
+            this.cbVersion.Text = "Select a version or type on in";
+            this.cbVersion.Visible = false;
+            this.cbVersion.SelectedIndexChanged += new System.EventHandler(this.CbVersion_SelectedIndexChanged);
+            // 
+            // btnVersionList
+            // 
+            this.btnVersionList.Location = new System.Drawing.Point(12, 38);
+            this.btnVersionList.Name = "btnVersionList";
+            this.btnVersionList.Size = new System.Drawing.Size(75, 23);
+            this.btnVersionList.TabIndex = 19;
+            this.btnVersionList.Text = "Version List";
+            this.btnVersionList.UseVisualStyleBackColor = true;
+            this.btnVersionList.Visible = false;
+            this.btnVersionList.Click += new System.EventHandler(this.Button1_Click_3);
+            // 
+            // btnArgumentEditor
+            // 
+            this.btnArgumentEditor.Location = new System.Drawing.Point(358, 54);
+            this.btnArgumentEditor.Name = "btnArgumentEditor";
+            this.btnArgumentEditor.Size = new System.Drawing.Size(133, 36);
+            this.btnArgumentEditor.TabIndex = 20;
+            this.btnArgumentEditor.Text = "Argument Editor";
+            this.btnArgumentEditor.UseVisualStyleBackColor = true;
+            this.btnArgumentEditor.Visible = false;
+            this.btnArgumentEditor.Click += new System.EventHandler(this.Button1_Click_4);
+            // 
             // ServerLauncher
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnArgumentEditor);
+            this.Controls.Add(this.btnVersionList);
+            this.Controls.Add(this.cbVersion);
             this.Controls.Add(this.btnManageWorlds);
             this.Controls.Add(this.btnQuit);
             this.Controls.Add(this.lblQLaunch);
@@ -271,5 +310,8 @@
         private System.Windows.Forms.Label lblQLaunch;
         private System.Windows.Forms.Button btnQuit;
         private System.Windows.Forms.Button btnManageWorlds;
+        private System.Windows.Forms.ComboBox cbVersion;
+        private System.Windows.Forms.Button btnVersionList;
+        private System.Windows.Forms.Button btnArgumentEditor;
     }
 }

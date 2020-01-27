@@ -12,12 +12,15 @@ using System.Collections;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.Net;
 
 namespace MCServerLauncher
 {
+
+
     public partial class ServerLauncher : Form
     {
-
+        List<MinecraftVersion> mcversion = new List<MinecraftVersion>();
         bool bModifyProp = false;
         bool bReady = false;
         public ServerLauncher()
@@ -62,6 +65,7 @@ namespace MCServerLauncher
             btnRedownload.Show();
             lblQLaunch.Hide();
             chkCOSL.Checked = Program.bCloseOnServerLaunch;
+            btnVersionList.Show();
             btnQuit.Hide();
             //Program.start_server_vanilla("1.8.6");
         }
@@ -103,10 +107,21 @@ namespace MCServerLauncher
         {
 
             tbVersion.Text = lbVersion.Items[lbVersion.SelectedIndex].ToString();
+            //cbVersion.Text = lbVersion.Items[lbVersion.SelectedIndex].ToString();
         }
 
         private void Button3_Click(object sender, EventArgs e)
         {
+
+            if(tbVersion.Text == "Timotainment")
+            {
+                ProcessStartInfo a = new ProcessStartInfo("explorer", "www.youtube.com/embed/CBb2AsiFhsA");
+                System.Diagnostics.Process.Start(a);
+                return;
+            }
+
+
+
             if (!bModifyProp)
             {
                 switch (clbSType.CheckedItems[0].ToString())
@@ -238,10 +253,14 @@ namespace MCServerLauncher
             btnQuit.Hide();
             btnManageWorlds.Show();
             bModifyProp = true;
+            btnArgumentEditor.Show();
+            btnLaunchS.Text = "Modify Properties";
         }
 
         private void BtnReturn_Click(object sender, EventArgs e)
         {
+            btnLaunchS.Text = "Go!";
+            btnVersionList.Hide();
             btnQLaunch.Show();
             btnModifyProp.Show();
             btnLaunch.Show();
@@ -261,6 +280,7 @@ namespace MCServerLauncher
             lblQLaunch.Text = Program.sQLaunchSType + " / " + Program.sQLaunchSVersion;
             lblQLaunch.Show();
             btnQuit.Show();
+            btnArgumentEditor.Hide();
         }
 
         private void CheckBox1_CheckedChanged(object sender, EventArgs e)
@@ -347,6 +367,27 @@ namespace MCServerLauncher
 
         private void ServerLauncher_Load(object sender, EventArgs e)
         {
+            /*
+            var client = new WebClient();
+            var data = client.DownloadData("https://launchermeta.mojang.com/mc/game/version_manifest.json");
+
+
+            var str = Encoding.UTF8.GetString(data);
+
+            var job = JObject.Parse(str);
+
+            foreach (JToken token in job["versions"])
+            {
+               // 
+                bool snap = token["type"].ToString() == "release";
+                string version = token["id"].ToString();
+                    
+                mcversion.Add(new MinecraftVersion(version,snap));
+                cbVersion.Items.Add(token["id"].ToString());
+            }
+
+
+    */
 
         }
 
@@ -355,71 +396,125 @@ namespace MCServerLauncher
             var WM = new WorldMod("Servers\\" + clbSType.CheckedItems[0].ToString() + "\\" + tbVersion.Text);
             WM.ShowDialog();
         }
+
+        private void CbVersion_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var TextBoxv = (ComboBox)sender;
+            if (TextBoxv.Text == "")
+            {
+                btnRedownload.Enabled = false;
+                return;
+            }
+            if (!bReady)
+                return;
+            if (!Directory.Exists("Servers"))
+                Directory.CreateDirectory("Servers");
+
+            if (clbSType.CheckedItems.Count == 1)
+            {
+                if (!Directory.Exists("Servers/" + clbSType.CheckedItems[0].ToString()))
+                    Directory.CreateDirectory("Servers/" + clbSType.CheckedItems[0].ToString());
+
+
+                btnRedownload.Enabled = Directory.Exists("Servers/" + clbSType.CheckedItems[0].ToString() + "/" + TextBoxv.Text);
+                btnManageWorlds.Enabled = Directory.Exists("Servers/" + clbSType.CheckedItems[0].ToString() + "/" + TextBoxv.Text);
+            }
+        }
+
+        private void Button1_Click_3(object sender, EventArgs e)
+        {
+            var vl = new MCServerLauncher.Diags.VersionList();
+            vl.SelectedVersion = "NONE";
+            vl.ShowDialog();
+           
+            if(vl.SelectedVersion != "NONE")
+            tbVersion.Text = vl.SelectedVersion;
+        }
+
+        private void Button1_Click_4(object sender, EventArgs e)
+        {
+            var sPropDir = "Servers/" + clbSType.CheckedItems[0].ToString() + "/" + tbVersion.Text;
+            if (!File.Exists(sPropDir + "/server.json"))
+            {
+                var set = new JObject();
+                set["sLaunchArgs"] = "-Xmx1024M -Xms1024M -jar server.jar";
+                File.WriteAllText(sPropDir + "/server.json", set.ToString());
+            }
+            var job = JObject.Parse(File.ReadAllText(sPropDir + "/server.json"));
+            var da = new diagArgs(job["sLaunchArgs"].ToString());
+            da.ShowDialog();
+            job["sLaunchArgs"] = da._args;
+            File.WriteAllText(sPropDir + "/server.json", job.ToString());
+            da.Dispose();
+        }
     }
 
     public class VersionSorter : IComparer
     {
         public int Compare(object a, object b)
         {
-            var s1 = (string)a;
-            var s2 = (string)b;
 
-            var s1s = s1.Split('.');
-            var s2s = s2.Split('.');
-            var s1Snapshot = false;
-            var s2Snapshot = false;
-            var s1Pre = false;
-            var s2Pre = false;
-
-
-            if (s1.Contains("pre"))
-                s1Pre = true;
-            if (s2.Contains("pre"))
-                s2Pre = true;
-
-
-
-
-            if (s1s.Length == 1)
+            try
             {
-                s1s = s1.Split('w');
-                s1Snapshot = true;
-            }
-            if (s2s.Length == 1)
-            {
-                s2s = s2.Split('w');
-                s2Snapshot = true;
-            }
+                var s1 = (string)a;
+                var s2 = (string)b;
 
-            if(s1Snapshot && s2Snapshot)
-            {
-                var s1n1 = Convert.ToInt32(s1s[0]);
-                var s1n2 = Convert.ToInt32(s1s[1].Substring(0, 2));
-                var s2n1 = Convert.ToInt32(s2s[0]);
-                var s2n2 = Convert.ToInt32(s2s[1].Substring(0, 2));
-
-               
-                if (s1n1 > s2n1)
-                    return -1;
-                if (s1n1 < s2n1)
-                    return 1;
-                //throw new Exception();
-                if (s1n2 > s2n2)
-                    return -1;
-                if (s1n2 < s2n2)
-                    return 1;
-
-                
-            }
+                var s1s = s1.Split('.');
+                var s2s = s2.Split('.');
+                var s1Snapshot = false;
+                var s2Snapshot = false;
+                var s1Pre = false;
+                var s2Pre = false;
 
 
-            
+                if (s1.Contains("pre"))
+                    s1Pre = true;
+                if (s2.Contains("pre"))
+                    s2Pre = true;
+
+
+
+
+                if (s1s.Length == 1)
+                {
+                    s1s = s1.Split('w');
+                    s1Snapshot = true;
+                }
+                if (s2s.Length == 1)
+                {
+                    s2s = s2.Split('w');
+                    s2Snapshot = true;
+                }
+
+                if (s1Snapshot && s2Snapshot)
+                {
+                    var s1n1 = Convert.ToInt32(s1s[0]);
+                    var s1n2 = Convert.ToInt32(s1s[1].Substring(0, 2));
+                    var s2n1 = Convert.ToInt32(s2s[0]);
+                    var s2n2 = Convert.ToInt32(s2s[1].Substring(0, 2));
+
+
+                    if (s1n1 > s2n1)
+                        return -1;
+                    if (s1n1 < s2n1)
+                        return 1;
+                    //throw new Exception();
+                    if (s1n2 > s2n2)
+                        return -1;
+                    if (s1n2 < s2n2)
+                        return 1;
+
+
+                }
+
+
+
                 if (s1Pre || s2Pre)
                 {
-                if (s1Snapshot)
-                    return 1;
-                if (s2Snapshot)
-                    return -1;
+                    if (s1Snapshot)
+                        return 1;
+                    if (s2Snapshot)
+                        return -1;
 
                     var cc1 = s1.Split(new string[] { "-pre" }, StringSplitOptions.None);
                     var cc2 = s2.Split(new string[] { "-pre" }, StringSplitOptions.None);
@@ -427,8 +522,8 @@ namespace MCServerLauncher
                     var cc2Split = cc2[0].Split('.');
                     var Minor1 = Convert.ToInt32(cc1Split[1]);
                     var Minor2 = Convert.ToInt32(cc2Split[1]);
-                var Rev1 = cc1Split.Length == 3 ? Convert.ToInt32(cc1Split[2]) : 0;
-                var Rev2 = cc2Split.Length == 3 ? Convert.ToInt32(cc2Split[2]) : 0;
+                    var Rev1 = cc1Split.Length == 3 ? Convert.ToInt32(cc1Split[2]) : 0;
+                    var Rev2 = cc2Split.Length == 3 ? Convert.ToInt32(cc2Split[2]) : 0;
 
 
                     if (Minor1 > Minor2)
@@ -436,12 +531,12 @@ namespace MCServerLauncher
                     else if (Minor1 < Minor2)
                         return -1;
 
-                if (Rev1 > Rev2)
-                    return -1;
-                else if (Rev1 < Rev2)
-                    return 1;
+                    if (Rev1 > Rev2)
+                        return -1;
+                    else if (Rev1 < Rev2)
+                        return 1;
 
-                if (cc2.Length == 1)
+                    if (cc2.Length == 1)
                         return 1;
                     if (cc1.Length == 1)
                         return -1;
@@ -455,32 +550,48 @@ namespace MCServerLauncher
 
 
 
-            var s1Minor = !s1Snapshot && !s1Pre ? Convert.ToInt32(s1s[!s1Snapshot ? 1 : 0]) : 0 ;
-            var s2Minor = !s2Snapshot && !s2Pre ? Convert.ToInt32(s2s[!s2Snapshot ? 1 : 0]) : 0;
-            var s1Fix = 0;
-            var s2Fix = 0;
+                var s1Minor = !s1Snapshot && !s1Pre ? Convert.ToInt32(s1s[!s1Snapshot ? 1 : 0]) : 0;
+                var s2Minor = !s2Snapshot && !s2Pre ? Convert.ToInt32(s2s[!s2Snapshot ? 1 : 0]) : 0;
+                var s1Fix = 0;
+                var s2Fix = 0;
 
-            if (!s1Pre)
-            s1Fix = s1s.Length > 2 ? Convert.ToInt32(s1s[2]) : 0;
-            if(!s2Pre)
-            s2Fix = s2s.Length > 2 ? Convert.ToInt32(s2s[2]) : 0;
+                if (!s1Pre)
+                    s1Fix = s1s.Length > 2 ? Convert.ToInt32(s1s[2]) : 0;
+                if (!s2Pre)
+                    s2Fix = s2s.Length > 2 ? Convert.ToInt32(s2s[2]) : 0;
 
-            var snparent = s1Snapshot ? ServerLauncher.GetSnapshotParent(s1) : s2Snapshot ? ServerLauncher.GetSnapshotParent(s2) : "";
+                var snparent = s1Snapshot ? ServerLauncher.GetSnapshotParent(s1) : s2Snapshot ? ServerLauncher.GetSnapshotParent(s2) : "";
 
-            if (s1Snapshot)
-                if (s2Minor.ToString() == snparent.Split('.')[1])
-                    return 1;
-            if (s2Snapshot)
-                if (s1Minor.ToString() == snparent.Split('.')[1])
-                    return 1;
+                if (s1Snapshot)
+                    if (s2Minor.ToString() == snparent.Split('.')[1])
+                        return 1;
+                if (s2Snapshot)
+                    if (s1Minor.ToString() == snparent.Split('.')[1])
+                        return 1;
 
-           
-            if (s1Minor > s2Minor)
-                return -1;
-            else if (s1Minor == s2Minor && s1Fix > s2Fix)
-                return -1;
-            else return 1;
+
+                if (s1Minor > s2Minor)
+                    return -1;
+                else if (s1Minor == s2Minor && s1Fix > s2Fix)
+                    return -1;
+                else return 1;
+            } catch
+            {
+                return 1;
+            }
+            }
+
+    }
+
+    public class MinecraftVersion
+    {
+        public string version;
+        public bool snapshot;
+
+        public MinecraftVersion(string ver, bool snap)
+        {
+            version = ver;
+            snapshot = snap;
         }
-
     }
 }

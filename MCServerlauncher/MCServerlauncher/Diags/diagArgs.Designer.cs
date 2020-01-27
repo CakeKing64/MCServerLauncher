@@ -70,6 +70,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Name = "diagArgs";
             this.Text = "Argument Editor";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DiagArgs_FormClosing);
             this.Load += new System.EventHandler(this.DiagArgs_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DiagArgs_KeyDown);
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).EndInit();

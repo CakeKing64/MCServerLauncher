@@ -68,5 +68,19 @@ namespace MCServerLauncher
                 e.SuppressKeyPress = true;
             }
         }
+
+        private void DiagArgs_FormClosing(object sender, FormClosingEventArgs e)
+        {
+
+            if(this.Text == "Argument Editor*")
+            {
+                DialogResult dr = MessageBox.Show("You have unsaved changes, would you like to save?","Unsaved Changes",MessageBoxButtons.YesNoCancel,MessageBoxIcon.Warning);
+
+                if(dr == DialogResult.Yes)
+                   _args = textBox1.Text;
+                if (dr == DialogResult.Cancel)
+                    e.Cancel = true;
+            }
+        }
     }
 }
