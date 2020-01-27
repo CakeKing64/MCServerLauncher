@@ -264,6 +264,7 @@ namespace MCServerLauncher
             btnArgumentEditor.Show();
             btnLaunchS.Text = "Modify Properties";
             btnExplorer.Show();
+            TbVersion_TextChanged(tbVersion, null);
         }
 
         private void BtnReturn_Click(object sender, EventArgs e)
@@ -280,6 +281,10 @@ namespace MCServerLauncher
             lbVersion.Hide();
             tbVersion.Hide();
             btnLaunchS.Hide();
+            btnExplorer.Enabled = true;
+            btnLaunchS.Enabled = true;
+            btnArgumentEditor.Enabled = true;
+            btnModifyProp.Enabled = true;
             btnReturn.Hide();
             bModifyProp = false;
             chkCOSL.Hide();
@@ -333,9 +338,19 @@ namespace MCServerLauncher
             if (!Directory.Exists("Servers"))
                 Directory.CreateDirectory("Servers");
             if (Directory.Exists(sPropDir))
+            {
                 btnExplorer.Enabled = true;
+                btnLaunchS.Enabled = true;
+                btnArgumentEditor.Enabled = true;
+                btnModifyProp.Enabled = true;
+            }
             else
+            {
                 btnExplorer.Enabled = false;
+                btnLaunchS.Enabled = false;
+                btnArgumentEditor.Enabled = false;
+                btnModifyProp.Enabled = false;
+            }
 
             if (clbSType.CheckedItems.Count == 1)
             {
