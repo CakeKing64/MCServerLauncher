@@ -18,6 +18,8 @@ namespace MCServerLauncher
 
         private string svdir;
         ServerProperties svp;
+
+        private bool BackupMode = false; // false Worlds -> Backups. true Backups -> Worlds, you get it
         public WorldMod(string dir)
         {
             InitializeComponent();
@@ -34,7 +36,7 @@ namespace MCServerLauncher
             foreach (string dir in dirs)
             {
                 var dir_s = dir.Substring(svdir.Length + 1);
-                if (File.Exists(dir + "/level.dat") && !dir_s.Contains("_the_end") && !dir.Contains("_nether"))
+                if ((File.Exists(dir + "/level.dat") || Directory.Exists(dir + "/region")) && !dir_s.Contains("_the_end") && !dir.Contains("_nether"))
                 lstWorlds.Items.Add(dir_s);
 
                 if (dir_s == svp.ServerVars["level-name"].value)
@@ -52,7 +54,7 @@ namespace MCServerLauncher
             foreach (string dir in dirs)
             {
                 var dir_s = dir.Substring(svdir.Length + 15);
-                if (File.Exists(dir + "/level.dat") && !dir_s.Contains("_the_end") && !dir.Contains("_nether"))
+                if ((File.Exists(dir + "/level.dat") || Directory.Exists(dir + "/region")) && !dir_s.Contains("_the_end") && !dir.Contains("_nether"))
                     lstBackups.Items.Add(dir_s);
 
             }
@@ -72,18 +74,29 @@ namespace MCServerLauncher
 
         private void LstBackups_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            if (lstBackups.SelectedIndex != -1)
+            {
+                lstWorlds.SelectedIndex = -1;
+                btnCopy.Text = "Copy from backups";
+                btnMoveBack.Text = "Move from backups";
+                BackupMode = true;
+                btnSet.Enabled = false;
+            }
         }
 
         private void LstWorlds_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //btnCopy.Text = "";
+            if (lstWorlds.SelectedIndex != -1)
+            {
+                lstBackups.SelectedIndex = -1;
+                btnCopy.Text = "Copy to backups";
+                btnMoveBack.Text = "Move to backups";
+                BackupMode = false;
+                btnSet.Enabled = true;
+            }
         }
 
-        private void BtnCopy_Click(object sender, EventArgs e)
-        { 
 
-        }
 
         private void BtnRefresh_Click(object sender, EventArgs e)
         {
@@ -187,20 +200,53 @@ namespace MCServerLauncher
             }
 
         }
+        void CLONE_DIRECTORY(string inDir, string toDir)
+        {
+            Directory.CreateDirectory(toDir);
+            foreach (string file in Directory.GetFiles(inDir))
+            {
+                File.Copy(file,toDir + "\\" + Path.GetFileName(file));
+            }
+            foreach (string dir in Directory.GetDirectories(inDir))
+            {
+                string outdir = toDir + "\\" + Path.GetFileName(dir);
+                CLONE_DIRECTORY(dir, outdir);
+            }
+        }
         private void BtnDelete_Click(object sender, EventArgs e)
         {
             
-            if(lstWorlds.SelectedIndex == -1)
+            if(!BackupMode ? lstWorlds.SelectedIndex == -1 : lstBackups.SelectedIndex == -1)
             {
                 MessageBox.Show("Please select a world first!");
                 return;
             }
-            DialogResult dg = MessageBox.Show("Are you sure you want to delete \"" + lstWorlds.Items[lstWorlds.SelectedIndex].ToString() + "\"?\nThis cannot be undone", "Confirm.", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            DialogResult dg = DialogResult.Cancel;
+
+            if (lstWorlds.SelectedItems.Count > 1 || lstBackups.SelectedItems.Count > 1)
+                dg = MessageBox.Show("Are you sure you want to delete multiple worlds?\nThis cannot be undone", "Confirm.", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            else
+            dg = MessageBox.Show("Are you sure you want to delete \"" + (!BackupMode ? lstWorlds.Items[lstWorlds.SelectedIndex].ToString() : lstBackups.Items[lstBackups.SelectedIndex].ToString()) + "\"?\nThis cannot be undone", "Confirm.", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+                
 
             if (dg == DialogResult.Yes)
             {
-                THANOS_SNAP(svdir + "/" + lstWorlds.Items[lstWorlds.SelectedIndex].ToString());
-                Directory.Delete(svdir + "/" + lstWorlds.Items[lstWorlds.SelectedIndex].ToString());
+                if (!BackupMode)
+                {
+                    foreach (object obj in lstWorlds.SelectedItems)
+                    {
+                        THANOS_SNAP(svdir + "/" + obj.ToString());
+                        Directory.Delete(svdir + "/" + obj.ToString());
+                    }
+                }
+                else
+                {
+                    foreach (object obj in lstBackups.SelectedItems)
+                    {
+                        THANOS_SNAP(svdir + "/world_backups/" + obj.ToString());
+                        Directory.Delete(svdir + "/world_backups/" + obj.ToString());
+                    }
+                }
                 RefreshWorlds();
             }
             else
@@ -209,27 +255,236 @@ namespace MCServerLauncher
 
         private void BtnOpen_Click(object sender, EventArgs e)
         {
-            if (lstWorlds.SelectedIndex == -1)
+            string dir = "";
+            if (!BackupMode)
             {
-                MessageBox.Show("Please select a world first!");
-                return;
+                if (lstWorlds.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Please select a world first!");
+                    return;
+                }
+                dir = "\"" + Directory.GetCurrentDirectory() + "\\" + svdir + "\\" + lstWorlds.Items[lstWorlds.SelectedIndex].ToString() + "\"";
+                
+            } else
+            {
+                if (lstBackups.SelectedIndex == -1)
+                {
+                    MessageBox.Show("Please select a world first!");
+                    return;
+                }
+                dir = "\"" + Directory.GetCurrentDirectory() + "\\" + svdir + "\\world_backups\\" + lstBackups.Items[lstBackups.SelectedIndex].ToString() + "\"";
             }
-            var dir = "\"" + Directory.GetCurrentDirectory() + "\\" + svdir + "\\" + lstWorlds.Items[lstWorlds.SelectedIndex].ToString() + "\"";
-            ProcessStartInfo a = new ProcessStartInfo("explorer", dir);
+
+            ProcessStartInfo a = new ProcessStartInfo("explorer", "\"" + dir + "\"");
             System.Diagnostics.Process.Start(a);
         }
 
-        private void BtnMoveBack_Click(object sender, EventArgs e)
+        #region "Copy and paste code, don't look here, it's horrible :)"
+        /*
+         * Honestly there was probably a much better (and prettier way)
+         * but this works and I'm gonna stick with it.
+         * 
+         */
+        private void MoveToBackups(string worldn)
         {
-            var worldn = lstWorlds.Items[lstWorlds.SelectedIndex].ToString();
+            var ovr = 0;
             if (!Directory.Exists(svdir + "\\world_backups"))
                 Directory.CreateDirectory(svdir + "\\world_backups");
-                if(Directory.Exists(svdir + "\\" + worldn + "_nether"))
-                    Directory.Move(svdir + "\\" + worldn + "_nether", svdir + "\\world_backups\\" + worldn + "_nether");
-            if (Directory.Exists(svdir + "\\" + worldn + "_the_end"))
-                Directory.Move(svdir + "\\" + worldn + "_the_end", svdir + "\\world_backups\\" + worldn + "_the_end");
 
-                Directory.Move(svdir + "\\" + worldn, svdir + "\\world_backups\\" + worldn);
+            if (Directory.Exists(svdir + "\\world_backups\\" + worldn))
+            {
+                DialogResult res = MessageBox.Show("World already exists in backup, would you like to override it?", "World already exists", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+
+                if (res == DialogResult.Yes)
+                {
+                    THANOS_SNAP(svdir + "\\world_backups\\" + worldn);
+                    ovr = 2; // 2 is unused but it looks like i'm doing work :)
+                }
+                if (res == DialogResult.No)
+                    ovr = 1;
+
+
+                if (res == DialogResult.Cancel)
+                    return;
+            }
+
+            var worldx = worldn;
+            var worldi = 1;
+            if (ovr == 1)
+            {
+                worldx = worldn + " (" + worldi + ")";
+                while (Directory.Exists(svdir + "\\world_backups\\" + worldn + " (" + worldi + ")"))
+                {
+                    worldi++;
+                    worldx = worldn + " (" + worldi + ")";
+                }
+
+            }
+
+            /*
+            if (Directory.Exists(svdir + "\\" + worldn + "_nether"))
+                Directory.Move(svdir + "\\" + worldn + "_nether", svdir + "\\world_backups\\" + worldx + "_nether");
+            if (Directory.Exists(svdir + "\\" + worldn + "_the_end"))
+                Directory.Move(svdir + "\\" + worldn + "_the_end", svdir + "\\world_backups\\" + worldx + "_the_end");
+                */
+            Directory.Move(svdir + "\\" + worldn, svdir + "\\world_backups\\" + worldx);
+        }
+        private void MoveFromBackups(string worldn)
+        {
+            var ovr = 0;
+            if (!Directory.Exists(svdir + "\\world_backups"))
+                Directory.CreateDirectory(svdir + "\\world_backups");
+
+            if (Directory.Exists(svdir + "\\" + worldn))
+            {
+                DialogResult res = MessageBox.Show("World already exists, would you like to override it?", "World already exists", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+
+                if (res == DialogResult.Yes)
+                {
+                    THANOS_SNAP(svdir + "\\" + worldn);
+                    ovr = 2; // 2 is unused but it looks like i'm doing work :)
+                }
+                if (res == DialogResult.No)
+                    ovr = 1;
+
+
+                if (res == DialogResult.Cancel)
+                    return;
+            }
+
+            var worldx = worldn;
+            var worldi = 1;
+            if (ovr == 1)
+            {
+                worldx = worldn + " (" + worldi + ")";
+                while (Directory.Exists(svdir + "\\" + worldn + " (" + worldi + ")"))
+                {
+                    worldi++;
+                    worldx = worldn + " (" + worldi + ")";
+                }
+
+            }
+
+            /*
+            if (Directory.Exists(svdir + "\\" + worldn + "_nether"))
+                Directory.Move(svdir + "\\" + worldn + "_nether", svdir + "\\world_backups\\" + worldx + "_nether");
+            if (Directory.Exists(svdir + "\\" + worldn + "_the_end"))
+                Directory.Move(svdir + "\\" + worldn + "_the_end", svdir + "\\world_backups\\" + worldx + "_the_end");
+            */
+            Directory.Move(svdir + "\\world_backups\\" + worldn, svdir + "\\" + worldx);
+        }
+        private void CopyToBackups(string worldn)
+        {
+            var ovr = 0;
+            if (!Directory.Exists(svdir + "\\world_backups"))
+                Directory.CreateDirectory(svdir + "\\world_backups");
+
+            if (Directory.Exists(svdir + "\\world_backups\\" + worldn))
+            {
+                DialogResult res = MessageBox.Show("World already exists in backup, would you like to override it?", "World already exists", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+
+                if (res == DialogResult.Yes)
+                {
+                    THANOS_SNAP(svdir + "\\world_backups\\" + worldn);
+                    ovr = 2; // 2 is unused but it looks like i'm doing work :)
+                }
+                if (res == DialogResult.No)
+                    ovr = 1;
+
+
+                if (res == DialogResult.Cancel)
+                    return;
+            }
+            var worldx = worldn;
+            var worldi = 1;
+            if (ovr == 1)
+            {
+                worldx = worldn + " (" + worldi + ")";
+                while (Directory.Exists(svdir + "\\world_backups\\" + worldn + " (" + worldi + ")"))
+                {
+                    worldi++;
+                    worldx = worldn + " (" + worldi + ")";
+                }
+
+            }
+
+            /*
+            if (Directory.Exists(svdir + "\\" + worldn + "_nether"))
+                CLONE_DIRECTORY(svdir + "\\" + worldn + "_nether", svdir + "\\world_backups\\" + worldx + "_nether");
+            if (Directory.Exists(svdir + "\\" + worldn + "_the_end"))
+                CLONE_DIRECTORY(svdir + "\\" + worldn + "_the_end", svdir + "\\world_backups\\" + worldx + "_the_end");
+                */
+            CLONE_DIRECTORY(svdir + "\\" + worldn,svdir + "\\world_backups\\" + worldx);
+        }
+        private void CopyFromBackups(string worldn)
+        {
+            var ovr = 0;
+            if (!Directory.Exists(svdir + "\\world_backups"))
+                Directory.CreateDirectory(svdir + "\\world_backups");
+
+            if (Directory.Exists(svdir + "\\" + worldn))
+            {
+                DialogResult res = MessageBox.Show("World already exists, would you like to override it?", "World already exists", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+
+                if (res == DialogResult.Yes)
+                {
+                    THANOS_SNAP(svdir + "\\" + worldn);
+                    ovr = 2; // 2 is unused but it looks like i'm doing work :)
+                }
+                if (res == DialogResult.No)
+                    ovr = 1;
+
+
+                if (res == DialogResult.Cancel)
+                    return;
+            }
+
+            var worldx = worldn;
+            var worldi = 1;
+            if (ovr == 1)
+            {
+                worldx = worldn + " (" + worldi + ")";
+                while (Directory.Exists(svdir + "\\" + worldn + " (" + worldi + ")"))
+                {
+                    worldi++;
+                    worldx = worldn + " (" + worldi + ")";
+                }
+
+            }
+
+            /*
+            if (Directory.Exists(svdir + "\\" + worldn + "_nether"))
+                CLONE_DIRECTORY(svdir + "\\" + worldn + "_nether", svdir + "\\world_backups\\" + worldx + "_nether");
+            if (Directory.Exists(svdir + "\\" + worldn + "_the_end"))
+                CLONE_DIRECTORY(svdir + "\\" + worldn + "_the_end", svdir + "\\world_backups\\" + worldx + "_the_end");
+                */
+            CLONE_DIRECTORY(svdir + "\\world_backups\\" + worldn, svdir + "\\" + worldx);
+
+        }
+        #endregion
+
+
+        private void BtnMoveBack_Click(object sender, EventArgs e)
+        {
+            if (!BackupMode)
+                foreach(object obj in lstWorlds.SelectedItems)
+                MoveToBackups(obj.ToString());
+            else
+                foreach (object obj in lstBackups.SelectedItems)
+                    MoveFromBackups(obj.ToString());
+
+            RefreshWorlds();
+        }
+        private void BtnCopy_Click(object sender, EventArgs e)
+        {
+            if (!BackupMode)
+                foreach (object obj in lstWorlds.SelectedItems)
+                    CopyToBackups(obj.ToString());
+            else
+                foreach (object obj in lstBackups.SelectedItems)
+                    CopyFromBackups(obj.ToString());
+            
+            RefreshWorlds();
         }
     }
 }

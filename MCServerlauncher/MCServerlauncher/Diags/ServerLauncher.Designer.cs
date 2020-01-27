@@ -48,6 +48,7 @@
             this.cbVersion = new System.Windows.Forms.ComboBox();
             this.btnVersionList = new System.Windows.Forms.Button();
             this.btnArgumentEditor = new System.Windows.Forms.Button();
+            this.btnExplorer = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnLaunch
@@ -258,11 +259,23 @@
             this.btnArgumentEditor.Visible = false;
             this.btnArgumentEditor.Click += new System.EventHandler(this.Button1_Click_4);
             // 
+            // btnExplorer
+            // 
+            this.btnExplorer.Location = new System.Drawing.Point(219, 54);
+            this.btnExplorer.Name = "btnExplorer";
+            this.btnExplorer.Size = new System.Drawing.Size(133, 36);
+            this.btnExplorer.TabIndex = 21;
+            this.btnExplorer.Text = "Open in Explorer";
+            this.btnExplorer.UseVisualStyleBackColor = true;
+            this.btnExplorer.Visible = false;
+            this.btnExplorer.Click += new System.EventHandler(this.BtnExplorer_Click);
+            // 
             // ServerLauncher
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnExplorer);
             this.Controls.Add(this.btnArgumentEditor);
             this.Controls.Add(this.btnVersionList);
             this.Controls.Add(this.cbVersion);
@@ -313,5 +326,6 @@
         private System.Windows.Forms.ComboBox cbVersion;
         private System.Windows.Forms.Button btnVersionList;
         private System.Windows.Forms.Button btnArgumentEditor;
+        private System.Windows.Forms.Button btnExplorer;
     }
 }

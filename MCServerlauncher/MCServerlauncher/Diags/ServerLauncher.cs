@@ -255,6 +255,7 @@ namespace MCServerLauncher
             bModifyProp = true;
             btnArgumentEditor.Show();
             btnLaunchS.Text = "Modify Properties";
+            btnExplorer.Show();
         }
 
         private void BtnReturn_Click(object sender, EventArgs e)
@@ -281,6 +282,7 @@ namespace MCServerLauncher
             lblQLaunch.Show();
             btnQuit.Show();
             btnArgumentEditor.Hide();
+            btnExplorer.Hide();
         }
 
         private void CheckBox1_CheckedChanged(object sender, EventArgs e)
@@ -310,6 +312,9 @@ namespace MCServerLauncher
         private void TbVersion_TextChanged(object sender, EventArgs e)
         {
             var TextBoxv = (TextBox)sender;
+
+            var sPropDir = clbSType.CheckedItems.Count > 0 ? "Servers\\" + clbSType.CheckedItems[0].ToString() + "\\" + tbVersion.Text : "$%?";
+
             if (TextBoxv.Text == "")
             {
                 btnRedownload.Enabled = false;
@@ -319,6 +324,10 @@ namespace MCServerLauncher
                 return;
             if (!Directory.Exists("Servers"))
                 Directory.CreateDirectory("Servers");
+            if (Directory.Exists(sPropDir))
+                btnExplorer.Enabled = true;
+            else
+                btnExplorer.Enabled = false;
 
             if (clbSType.CheckedItems.Count == 1)
             {
@@ -329,6 +338,8 @@ namespace MCServerLauncher
                 btnRedownload.Enabled = Directory.Exists("Servers/" + clbSType.CheckedItems[0].ToString() + "/" + TextBoxv.Text);
                 btnManageWorlds.Enabled = Directory.Exists("Servers/" + clbSType.CheckedItems[0].ToString() + "/" + TextBoxv.Text);
             }
+
+
                 
         }
 
@@ -446,6 +457,14 @@ namespace MCServerLauncher
             job["sLaunchArgs"] = da._args;
             File.WriteAllText(sPropDir + "/server.json", job.ToString());
             da.Dispose();
+        }
+
+        private void BtnExplorer_Click(object sender, EventArgs e)
+        {
+            var sPropDir = "Servers\\" + clbSType.CheckedItems[0].ToString() + "\\" + tbVersion.Text;
+            if (Directory.Exists(sPropDir))
+                Process.Start("explorer", '"' + Application.StartupPath + "\\" + sPropDir + '"');
+
         }
     }
 

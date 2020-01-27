@@ -47,6 +47,7 @@
             this.lstWorlds.FormattingEnabled = true;
             this.lstWorlds.Location = new System.Drawing.Point(12, 64);
             this.lstWorlds.Name = "lstWorlds";
+            this.lstWorlds.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
             this.lstWorlds.Size = new System.Drawing.Size(200, 290);
             this.lstWorlds.TabIndex = 0;
             this.lstWorlds.SelectedIndexChanged += new System.EventHandler(this.LstWorlds_SelectedIndexChanged);
@@ -59,6 +60,7 @@
             this.lstBackups.FormattingEnabled = true;
             this.lstBackups.Location = new System.Drawing.Point(343, 64);
             this.lstBackups.Name = "lstBackups";
+            this.lstBackups.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lstBackups.Size = new System.Drawing.Size(200, 290);
             this.lstBackups.TabIndex = 1;
             this.lstBackups.SelectedIndexChanged += new System.EventHandler(this.LstBackups_SelectedIndexChanged);
@@ -77,7 +79,6 @@
             // btnCopy
             // 
             this.btnCopy.AllowDrop = true;
-            this.btnCopy.Enabled = false;
             this.btnCopy.Location = new System.Drawing.Point(218, 93);
             this.btnCopy.Name = "btnCopy";
             this.btnCopy.Size = new System.Drawing.Size(119, 23);
