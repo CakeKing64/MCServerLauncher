@@ -48,7 +48,7 @@ namespace MCServerLauncher
         public static string sQLaunchSType = "Vanilla";
         public static string sQLaunchSVersion = "1.0";
         public static string sJavaPath = null;
-        public static bool bUseGUI = false;
+        public static bool bUseGUI = true;
         public static bool bFirstStart = true;
         public static bool bCloseOnServerLaunch = false;
         public static bool bUseGlobalLaunchArgs = false;
@@ -115,11 +115,10 @@ namespace MCServerLauncher
             job["sLatestVersion"] = sLatestVersion;
             job["bReadEULA"] = bReadEULA;
             job["sLaunchArgs"] = sLaunchArgs;
-            job["bUseGUI"] = false;
+            job["bUseGUI"] = true;
             job["sQLaunchSType"] = sQLaunchSType;
             job["sQLaunchSVersion"] = sQLaunchSVersion;
             job["sJavaPath"] = sJavaPath;
-            job["bUseGUI"] = bUseGUI;
             job["bCloseOnServerLaunch"] = bCloseOnServerLaunch;
             job["bFirstStart"] = bFirstStart;
             //job["bAskedGit"] = bAskedGit;
@@ -173,7 +172,7 @@ namespace MCServerLauncher
                 sQLaunchSType = GetString(job, "sQLaunchSType", sQLaunchSType);
                 sQLaunchSVersion = GetString(job, "sQLaunchSVersion", sQLaunchSVersion);
                 sJavaPath = GetString(job, "sJavapath", sJavaPath);
-                bUseGUI = job["bUseGUI"] != null ? bool.Parse(job["bUseGUI"].ToString()) : false;
+                bUseGUI = true;//job["bUseGUI"] != null ? bool.Parse(job["bUseGUI"].ToString()) : false;
                 bCloseOnServerLaunch = job["bCloseOnServerLaunch"] != null ? bool.Parse(job["bCloseOnServerLaunch"].ToString()) : false;
                 bFirstStart = job["bFirstStart"] != null ? bool.Parse(job["bFirstStart"].ToString()) : true;
                 //bAskedGit = job["bAskedGit"] != null ? bool.Parse(job["bAskedGit"].ToString()) : false;
@@ -293,6 +292,7 @@ namespace MCServerLauncher
             }
             Console.Clear();
 
+            /*
             if(bFirstStart)
             {
                 while (true)
@@ -318,6 +318,7 @@ namespace MCServerLauncher
                 SaveSettings();
 
             }
+            */
 
             var sLV = "";
             bool sLVWait = false;

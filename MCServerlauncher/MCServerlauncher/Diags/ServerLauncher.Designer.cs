@@ -191,6 +191,7 @@
             this.btnConsoleMode.TabIndex = 14;
             this.btnConsoleMode.Text = "Switch to Console mode";
             this.btnConsoleMode.UseVisualStyleBackColor = true;
+            this.btnConsoleMode.Visible = false;
             this.btnConsoleMode.Click += new System.EventHandler(this.Button1_Click_2);
             // 
             // lblQLaunch
