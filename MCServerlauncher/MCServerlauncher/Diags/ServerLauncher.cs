@@ -337,7 +337,7 @@ namespace MCServerLauncher
                 return;
             if (!Directory.Exists("Servers"))
                 Directory.CreateDirectory("Servers");
-            if (Directory.Exists(sPropDir))
+            if (Directory.Exists(sPropDir) || TextBoxv.Text == "Timotainment")
             {
                 btnExplorer.Enabled = true;
                 btnLaunchS.Enabled = true;

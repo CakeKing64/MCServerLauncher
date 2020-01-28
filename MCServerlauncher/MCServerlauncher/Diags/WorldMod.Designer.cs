@@ -41,15 +41,17 @@
             this.btnExit = new System.Windows.Forms.Button();
             this.btnOpen = new System.Windows.Forms.Button();
             this.btnRename = new System.Windows.Forms.Button();
+            this.lblBackups = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // lstWorlds
             // 
             this.lstWorlds.AllowDrop = true;
             this.lstWorlds.FormattingEnabled = true;
+            this.lstWorlds.HorizontalScrollbar = true;
             this.lstWorlds.Location = new System.Drawing.Point(12, 64);
             this.lstWorlds.Name = "lstWorlds";
-            this.lstWorlds.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
+            this.lstWorlds.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
             this.lstWorlds.Size = new System.Drawing.Size(200, 290);
             this.lstWorlds.TabIndex = 0;
             this.lstWorlds.SelectedIndexChanged += new System.EventHandler(this.LstWorlds_SelectedIndexChanged);
@@ -60,6 +62,7 @@
             // 
             this.lstBackups.AllowDrop = true;
             this.lstBackups.FormattingEnabled = true;
+            this.lstBackups.HorizontalScrollbar = true;
             this.lstBackups.Location = new System.Drawing.Point(343, 64);
             this.lstBackups.Name = "lstBackups";
             this.lstBackups.SelectionMode = System.Windows.Forms.SelectionMode.MultiExtended;
@@ -173,12 +176,22 @@
             this.btnRename.UseVisualStyleBackColor = true;
             this.btnRename.Click += new System.EventHandler(this.BtnRename_Click);
             // 
+            // lblBackups
+            // 
+            this.lblBackups.AutoSize = true;
+            this.lblBackups.Location = new System.Drawing.Point(340, 39);
+            this.lblBackups.Name = "lblBackups";
+            this.lblBackups.Size = new System.Drawing.Size(49, 13);
+            this.lblBackups.TabIndex = 12;
+            this.lblBackups.Text = "Backups";
+            // 
             // WorldMod
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(554, 450);
+            this.Controls.Add(this.lblBackups);
             this.Controls.Add(this.btnRename);
             this.Controls.Add(this.btnOpen);
             this.Controls.Add(this.btnExit);
@@ -217,5 +230,6 @@
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.Button btnOpen;
         private System.Windows.Forms.Button btnRename;
+        private System.Windows.Forms.Label lblBackups;
     }
 }
