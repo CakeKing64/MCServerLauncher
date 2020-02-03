@@ -435,6 +435,50 @@ namespace MCServerLauncher
             Program.CLONE_DIRECTORY(svdir + "\\world_backups\\" + worldn, svdir + "\\" + worldx);
 
         }
+        private void DuplicateWorld(string worldn)
+        {
+            var ovr = 0;
+            string xdir = BackupMode ? "\\world_backups" : "\\";
+            var worldx = worldn + " - Copy";
+            if (!Directory.Exists(svdir + xdir))
+                Directory.CreateDirectory(svdir + xdir);
+
+            if (Directory.Exists(svdir + xdir + "\\" + worldx))
+            {
+                DialogResult res = MessageBox.Show("World already exists, would you like to override it?", "World already exists", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+
+                if (res == DialogResult.Yes)
+                {
+                    Program.THANOS_SNAP(svdir + "\\" + worldx);
+                    ovr = 2; // 2 is unused but it looks like i'm doing work :)
+                }
+                if (res == DialogResult.No)
+                    ovr = 1;
+
+
+                if (res == DialogResult.Cancel)
+                    return;
+            }
+
+            
+            var worldi = 1;
+            if (ovr == 1)
+            {
+                worldx = worldn + " - Copy (" + worldi + ")";
+                while (Directory.Exists(svdir + xdir + "\\" + worldn + " (" + worldi + ")"))
+                {
+                    worldi++;
+                    worldx = worldn + " (" + worldi + ")";
+                }
+
+            }
+
+
+            Program.CLONE_DIRECTORY(svdir + xdir + "\\" + worldn, svdir + xdir + "\\" + worldx);
+
+        }
+
+
         #endregion
 
 
@@ -485,6 +529,19 @@ namespace MCServerLauncher
                     MessageBox.Show("World with name \"" + dgr.name + "\" already exists!");
                 
                 Directory.Move(svdir + "/" + (BackupMode ? "world_backups//" + lstBackups.SelectedItems[0].ToString() : lstWorlds.SelectedItems[0].ToString()) , svdir + "/" + (BackupMode ? "world_backups//" : "") + dgr.name);
+            RefreshWorlds();
+        }
+
+
+        private void btnDuplicate_Click(object sender, EventArgs e)
+        {
+            if (!BackupMode)
+                foreach (object obj in lstWorlds.SelectedItems)
+                    DuplicateWorld(obj.ToString());
+            else
+                foreach (object obj in lstBackups.SelectedItems)
+                    DuplicateWorld(obj.ToString());
+
             RefreshWorlds();
         }
     }

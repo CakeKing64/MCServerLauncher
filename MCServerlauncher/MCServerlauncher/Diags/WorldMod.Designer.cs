@@ -42,6 +42,7 @@
             this.btnOpen = new System.Windows.Forms.Button();
             this.btnRename = new System.Windows.Forms.Button();
             this.lblBackups = new System.Windows.Forms.Label();
+            this.btnDuplicate = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lstWorlds
@@ -106,7 +107,7 @@
             // btnDelete
             // 
             this.btnDelete.AllowDrop = true;
-            this.btnDelete.Location = new System.Drawing.Point(218, 181);
+            this.btnDelete.Location = new System.Drawing.Point(218, 210);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(119, 23);
             this.btnDelete.TabIndex = 5;
@@ -168,7 +169,7 @@
             // 
             // btnRename
             // 
-            this.btnRename.Location = new System.Drawing.Point(218, 152);
+            this.btnRename.Location = new System.Drawing.Point(218, 181);
             this.btnRename.Name = "btnRename";
             this.btnRename.Size = new System.Drawing.Size(119, 23);
             this.btnRename.TabIndex = 11;
@@ -185,12 +186,23 @@
             this.lblBackups.TabIndex = 12;
             this.lblBackups.Text = "Backups";
             // 
+            // btnDuplicate
+            // 
+            this.btnDuplicate.Location = new System.Drawing.Point(218, 152);
+            this.btnDuplicate.Name = "btnDuplicate";
+            this.btnDuplicate.Size = new System.Drawing.Size(119, 23);
+            this.btnDuplicate.TabIndex = 13;
+            this.btnDuplicate.Text = "Duplicate";
+            this.btnDuplicate.UseVisualStyleBackColor = true;
+            this.btnDuplicate.Click += new System.EventHandler(this.btnDuplicate_Click);
+            // 
             // WorldMod
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(554, 450);
+            this.Controls.Add(this.btnDuplicate);
             this.Controls.Add(this.lblBackups);
             this.Controls.Add(this.btnRename);
             this.Controls.Add(this.btnOpen);
@@ -231,5 +243,6 @@
         private System.Windows.Forms.Button btnOpen;
         private System.Windows.Forms.Button btnRename;
         private System.Windows.Forms.Label lblBackups;
+        private System.Windows.Forms.Button btnDuplicate;
     }
 }

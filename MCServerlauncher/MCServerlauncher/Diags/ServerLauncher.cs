@@ -298,6 +298,7 @@ namespace MCServerLauncher
             btnQuit.Show();
             btnArgumentEditor.Hide();
             btnExplorer.Hide();
+            CheckQLaunch();
         }
 
         private void CheckBox1_CheckedChanged(object sender, EventArgs e)
@@ -405,30 +406,28 @@ namespace MCServerLauncher
             this.Close();
         }
 
-        private void ServerLauncher_Load(object sender, EventArgs e)
+        private void CheckQLaunch()
         {
-            /*
-            var client = new WebClient();
-            var data = client.DownloadData("https://launchermeta.mojang.com/mc/game/version_manifest.json");
+            if (!Directory.Exists("Servers"))
+                Directory.CreateDirectory("Servers");
+            if (!Directory.Exists("Servers/Vanilla"))
+                Directory.CreateDirectory("Servers/Vanilla");
+            if (!Directory.Exists("Servers/Spigot"))
+                Directory.CreateDirectory("Servers/Spigot");
 
-
-            var str = Encoding.UTF8.GetString(data);
-
-            var job = JObject.Parse(str);
-
-            foreach (JToken token in job["versions"])
+            if (!Directory.Exists("Servers/" + Program.sQLaunchSType + "/" + Program.sQLaunchSVersion))
             {
-               // 
-                bool snap = token["type"].ToString() == "release";
-                string version = token["id"].ToString();
-                    
-                mcversion.Add(new MinecraftVersion(version,snap));
-                cbVersion.Items.Add(token["id"].ToString());
+                btnQLaunch.Enabled = false;
+                lblQLaunch.Text = "No quick launch version found";
+            } else
+            {
+                btnQLaunch.Enabled = true;
             }
 
-
-    */
-
+        }
+        private void ServerLauncher_Load(object sender, EventArgs e)
+        {
+            CheckQLaunch();
         }
 
         private void BtnManageWorlds_Click(object sender, EventArgs e)
