@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using System.Net;
+using System.Drawing.Imaging;
 
 namespace MCServerLauncher
 {
@@ -21,6 +22,7 @@ namespace MCServerLauncher
     public partial class ServerLauncher : Form
     {
         List<MinecraftVersion> mcversion = new List<MinecraftVersion>();
+        Dictionary<string, Image> ServerImageList = new Dictionary<string, Image>();
         bool bModifyProp = false;
         bool bReady = false;
         public ServerLauncher()
@@ -266,6 +268,8 @@ namespace MCServerLauncher
             btnArgumentEditor.Show();
             btnLaunchS.Text = "Modify Properties";
             btnExplorer.Show();
+            btnServerIcon.Show();
+            picServerIcon.Show();
             TbVersion_TextChanged(tbVersion, null);
         }
 
@@ -298,6 +302,8 @@ namespace MCServerLauncher
             btnQuit.Show();
             btnArgumentEditor.Hide();
             btnExplorer.Hide();
+            btnServerIcon.Hide();
+            picServerIcon.Hide();
             CheckQLaunch();
         }
 
@@ -349,6 +355,24 @@ namespace MCServerLauncher
                     btnLaunchS.Enabled = true;
                 btnArgumentEditor.Enabled = true;
                 btnModifyProp.Enabled = true;
+                btnServerIcon.Enabled = true;
+
+                var key = clbSType.CheckedItems[0].ToString() + "_" + TextBoxv.Text;
+                if (ServerImageList.ContainsKey(key))
+                {
+                    picServerIcon.Image = ServerImageList[key];
+                }
+                else
+                {
+                    if (File.Exists(sPropDir + "\\server-icon.png"))
+                    {
+                        ServerImageList.Add(key, Image.FromFile(sPropDir + "\\server-icon.png"));
+                        picServerIcon.Image = ServerImageList[key];
+                    } else
+                    {
+                        picServerIcon.Image = iml0.Images[0];
+                    }
+                }
             }
             else
             {
@@ -357,6 +381,9 @@ namespace MCServerLauncher
                     btnLaunchS.Enabled = false;
                 btnArgumentEditor.Enabled = false;
                 btnModifyProp.Enabled = false;
+
+                picServerIcon.Image = iml0.Images[0];
+                btnServerIcon.Enabled = false;
             }
 
             if (clbSType.CheckedItems.Count == 1)
@@ -428,6 +455,8 @@ namespace MCServerLauncher
         private void ServerLauncher_Load(object sender, EventArgs e)
         {
             CheckQLaunch();
+            picServerIcon.Image = iml0.Images[0];
+           
         }
 
         private void BtnManageWorlds_Click(object sender, EventArgs e)
@@ -492,6 +521,45 @@ namespace MCServerLauncher
             var sPropDir = "Servers\\" + clbSType.CheckedItems[0].ToString() + "\\" + tbVersion.Text;
             if (Directory.Exists(sPropDir))
                 Process.Start("explorer", '"' + Application.StartupPath + "\\" + sPropDir + '"');
+
+        }
+
+        private void btnServerIcon_Click(object sender, EventArgs e)
+        {
+            DialogResult dr = ofdServerIcon.ShowDialog();
+            if(dr == DialogResult.OK)
+            {
+                if (File.Exists(ofdServerIcon.FileName))
+                {
+                   Image img = Image.FromFile(ofdServerIcon.FileName);
+                    Image img_64res = new Bitmap(64, 64);
+
+                    using (Graphics g = Graphics.FromImage(img_64res))
+                    {
+                        ImageAttributes ia = new ImageAttributes();
+                        
+                            ia.SetWrapMode(System.Drawing.Drawing2D.WrapMode.TileFlipXY);
+
+                            g.DrawImage(img, new Rectangle(0, 0, 64, 64), 0, 0, img.Width, img.Height, GraphicsUnit.Pixel, ia);
+                    }
+
+                    picServerIcon.Image = img_64res;
+                    var imgpath = "Servers\\" + clbSType.CheckedItems[0].ToString() + "\\" + tbVersion.Text + "\\server-icon.png";
+                    if (File.Exists(imgpath))
+                    {
+                        var key = clbSType.CheckedItems[0].ToString() + "_" + tbVersion.Text;
+                        ServerImageList[key].Dispose();
+                        ServerImageList[key] = img_64res;
+                        File.Delete(imgpath);
+                    }
+                    img_64res.Save(imgpath);
+                }
+            }
+            
+        }
+
+        private void lblQLaunch_Click(object sender, EventArgs e)
+        {
 
         }
     }

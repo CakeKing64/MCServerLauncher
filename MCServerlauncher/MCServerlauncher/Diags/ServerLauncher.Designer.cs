@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ServerLauncher));
             this.btnLaunch = new System.Windows.Forms.Button();
             this.tbConsole = new System.Windows.Forms.TextBox();
@@ -49,6 +50,11 @@
             this.btnVersionList = new System.Windows.Forms.Button();
             this.btnArgumentEditor = new System.Windows.Forms.Button();
             this.btnExplorer = new System.Windows.Forms.Button();
+            this.picServerIcon = new System.Windows.Forms.PictureBox();
+            this.iml0 = new System.Windows.Forms.ImageList(this.components);
+            this.ofdServerIcon = new System.Windows.Forms.OpenFileDialog();
+            this.btnServerIcon = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.picServerIcon)).BeginInit();
             this.SuspendLayout();
             // 
             // btnLaunch
@@ -204,6 +210,7 @@
             this.lblQLaunch.TabIndex = 15;
             this.lblQLaunch.Text = "sands undertale";
             this.lblQLaunch.Visible = false;
+            this.lblQLaunch.Click += new System.EventHandler(this.lblQLaunch_Click);
             // 
             // btnQuit
             // 
@@ -271,11 +278,47 @@
             this.btnExplorer.Visible = false;
             this.btnExplorer.Click += new System.EventHandler(this.BtnExplorer_Click);
             // 
+            // picServerIcon
+            // 
+            this.picServerIcon.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.picServerIcon.Location = new System.Drawing.Point(319, 114);
+            this.picServerIcon.Name = "picServerIcon";
+            this.picServerIcon.Size = new System.Drawing.Size(128, 128);
+            this.picServerIcon.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.picServerIcon.TabIndex = 22;
+            this.picServerIcon.TabStop = false;
+            this.picServerIcon.Visible = false;
+            // 
+            // iml0
+            // 
+            this.iml0.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("iml0.ImageStream")));
+            this.iml0.TransparentColor = System.Drawing.Color.Transparent;
+            this.iml0.Images.SetKeyName(0, "unknown_pack.png");
+            // 
+            // ofdServerIcon
+            // 
+            this.ofdServerIcon.DefaultExt = "png";
+            this.ofdServerIcon.FileName = "server-icon.png";
+            this.ofdServerIcon.Filter = "PNG File|*.png";
+            // 
+            // btnServerIcon
+            // 
+            this.btnServerIcon.Location = new System.Drawing.Point(319, 248);
+            this.btnServerIcon.Name = "btnServerIcon";
+            this.btnServerIcon.Size = new System.Drawing.Size(128, 23);
+            this.btnServerIcon.TabIndex = 23;
+            this.btnServerIcon.Text = "Change Server Icon";
+            this.btnServerIcon.UseVisualStyleBackColor = true;
+            this.btnServerIcon.Visible = false;
+            this.btnServerIcon.Click += new System.EventHandler(this.btnServerIcon_Click);
+            // 
             // ServerLauncher
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnServerIcon);
+            this.Controls.Add(this.picServerIcon);
             this.Controls.Add(this.btnExplorer);
             this.Controls.Add(this.btnArgumentEditor);
             this.Controls.Add(this.btnVersionList);
@@ -302,6 +345,7 @@
             this.Text = "Server Launcher";
             this.Load += new System.EventHandler(this.ServerLauncher_Load);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ServerLauncher_KeyPress);
+            ((System.ComponentModel.ISupportInitialize)(this.picServerIcon)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -329,5 +373,9 @@
         private System.Windows.Forms.Button btnVersionList;
         private System.Windows.Forms.Button btnArgumentEditor;
         private System.Windows.Forms.Button btnExplorer;
+        private System.Windows.Forms.PictureBox picServerIcon;
+        private System.Windows.Forms.ImageList iml0;
+        private System.Windows.Forms.OpenFileDialog ofdServerIcon;
+        private System.Windows.Forms.Button btnServerIcon;
     }
 }
