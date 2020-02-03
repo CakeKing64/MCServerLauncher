@@ -50,7 +50,9 @@ namespace MCServerLauncher
         private void Button1_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Select a version, or type one in");
-            
+
+            TbVersion_TextChanged(tbVersion, null);
+
             btnQLaunch.Hide();
             btnModifyProp.Hide();
             btnLaunch.Hide();
@@ -326,6 +328,8 @@ namespace MCServerLauncher
         {
             var TextBoxv = (TextBox)sender;
 
+            
+
             var sPropDir = clbSType.CheckedItems.Count > 0 ? "Servers\\" + clbSType.CheckedItems[0].ToString() + "\\" + tbVersion.Text : "$%?";
 
             if (TextBoxv.Text == "")
@@ -340,14 +344,16 @@ namespace MCServerLauncher
             if (Directory.Exists(sPropDir) || TextBoxv.Text == "Timotainment")
             {
                 btnExplorer.Enabled = true;
-                btnLaunchS.Enabled = true;
+                if(bModifyProp)
+                    btnLaunchS.Enabled = true;
                 btnArgumentEditor.Enabled = true;
                 btnModifyProp.Enabled = true;
             }
             else
             {
                 btnExplorer.Enabled = false;
-                btnLaunchS.Enabled = false;
+                if (bModifyProp)
+                    btnLaunchS.Enabled = false;
                 btnArgumentEditor.Enabled = false;
                 btnModifyProp.Enabled = false;
             }
