@@ -438,7 +438,7 @@ namespace MCServerLauncher
         private void DuplicateWorld(string worldn)
         {
             var ovr = 0;
-            string xdir = BackupMode ? "\\world_backups" : "\\";
+            string xdir = BackupMode ? "\\world_backups" : "";
             var worldx = worldn + " - Copy";
             if (!Directory.Exists(svdir + xdir))
                 Directory.CreateDirectory(svdir + xdir);
@@ -465,10 +465,10 @@ namespace MCServerLauncher
             if (ovr == 1)
             {
                 worldx = worldn + " - Copy (" + worldi + ")";
-                while (Directory.Exists(svdir + xdir + "\\" + worldn + " (" + worldi + ")"))
+                while (Directory.Exists(svdir + xdir + "\\" + worldn + " - Copy (" + worldi + ")"))
                 {
                     worldi++;
-                    worldx = worldn + " (" + worldi + ")";
+                    worldx = worldn + " - Copy (" + worldi + ")";
                 }
 
             }
