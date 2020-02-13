@@ -82,5 +82,16 @@ namespace MCServerLauncher
                     e.Cancel = true;
             }
         }
+
+        private void btnArgumentGenerator_Click(object sender, EventArgs e)
+        {
+            Diags.diagArgumentGenerator dag = new Diags.diagArgumentGenerator(_args);
+            dag.ShowDialog();
+            
+            if (dag._args != "CLOSED")
+                textBox1.Text = dag._args;
+
+            dag.Dispose();
+        }
     }
 }

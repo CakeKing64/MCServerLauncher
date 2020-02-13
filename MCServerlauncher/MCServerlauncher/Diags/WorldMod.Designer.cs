@@ -43,6 +43,7 @@
             this.btnRename = new System.Windows.Forms.Button();
             this.lblBackups = new System.Windows.Forms.Label();
             this.btnDuplicate = new System.Windows.Forms.Button();
+            this.btnNewWorld = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // lstWorlds
@@ -74,7 +75,7 @@
             // btnMoveBack
             // 
             this.btnMoveBack.AllowDrop = true;
-            this.btnMoveBack.Location = new System.Drawing.Point(218, 64);
+            this.btnMoveBack.Location = new System.Drawing.Point(218, 90);
             this.btnMoveBack.Name = "btnMoveBack";
             this.btnMoveBack.Size = new System.Drawing.Size(119, 23);
             this.btnMoveBack.TabIndex = 2;
@@ -85,7 +86,7 @@
             // btnCopy
             // 
             this.btnCopy.AllowDrop = true;
-            this.btnCopy.Location = new System.Drawing.Point(218, 93);
+            this.btnCopy.Location = new System.Drawing.Point(218, 119);
             this.btnCopy.Name = "btnCopy";
             this.btnCopy.Size = new System.Drawing.Size(119, 23);
             this.btnCopy.TabIndex = 3;
@@ -96,7 +97,7 @@
             // btnSet
             // 
             this.btnSet.AllowDrop = true;
-            this.btnSet.Location = new System.Drawing.Point(218, 123);
+            this.btnSet.Location = new System.Drawing.Point(218, 149);
             this.btnSet.Name = "btnSet";
             this.btnSet.Size = new System.Drawing.Size(119, 23);
             this.btnSet.TabIndex = 4;
@@ -107,7 +108,7 @@
             // btnDelete
             // 
             this.btnDelete.AllowDrop = true;
-            this.btnDelete.Location = new System.Drawing.Point(218, 210);
+            this.btnDelete.Location = new System.Drawing.Point(218, 236);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(119, 23);
             this.btnDelete.TabIndex = 5;
@@ -169,7 +170,7 @@
             // 
             // btnRename
             // 
-            this.btnRename.Location = new System.Drawing.Point(218, 181);
+            this.btnRename.Location = new System.Drawing.Point(218, 207);
             this.btnRename.Name = "btnRename";
             this.btnRename.Size = new System.Drawing.Size(119, 23);
             this.btnRename.TabIndex = 11;
@@ -188,7 +189,7 @@
             // 
             // btnDuplicate
             // 
-            this.btnDuplicate.Location = new System.Drawing.Point(218, 152);
+            this.btnDuplicate.Location = new System.Drawing.Point(218, 178);
             this.btnDuplicate.Name = "btnDuplicate";
             this.btnDuplicate.Size = new System.Drawing.Size(119, 23);
             this.btnDuplicate.TabIndex = 13;
@@ -196,12 +197,23 @@
             this.btnDuplicate.UseVisualStyleBackColor = true;
             this.btnDuplicate.Click += new System.EventHandler(this.btnDuplicate_Click);
             // 
+            // btnNewWorld
+            // 
+            this.btnNewWorld.Location = new System.Drawing.Point(218, 61);
+            this.btnNewWorld.Name = "btnNewWorld";
+            this.btnNewWorld.Size = new System.Drawing.Size(119, 23);
+            this.btnNewWorld.TabIndex = 14;
+            this.btnNewWorld.Text = "New World";
+            this.btnNewWorld.UseVisualStyleBackColor = true;
+            this.btnNewWorld.Click += new System.EventHandler(this.btnNewWorld_Click);
+            // 
             // WorldMod
             // 
             this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(554, 450);
+            this.Controls.Add(this.btnNewWorld);
             this.Controls.Add(this.btnDuplicate);
             this.Controls.Add(this.lblBackups);
             this.Controls.Add(this.btnRename);
@@ -244,5 +256,6 @@
         private System.Windows.Forms.Button btnRename;
         private System.Windows.Forms.Label lblBackups;
         private System.Windows.Forms.Button btnDuplicate;
+        private System.Windows.Forms.Button btnNewWorld;
     }
 }

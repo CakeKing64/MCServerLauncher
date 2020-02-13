@@ -95,6 +95,12 @@
     <Compile Include="Diags\diagArgs.Designer.cs">
       <DependentUpon>diagArgs.cs</DependentUpon>
     </Compile>
+    <Compile Include="Diags\diagArgumentGenerator.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Diags\diagArgumentGenerator.Designer.cs">
+      <DependentUpon>diagArgumentGenerator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Diags\diagRename.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -152,6 +158,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Diags\diagArgs.resx">
       <DependentUpon>diagArgs.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Diags\diagArgumentGenerator.resx">
+      <DependentUpon>diagArgumentGenerator.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Diags\diagRename.resx">
       <DependentUpon>diagRename.cs</DependentUpon>

@@ -237,7 +237,7 @@
             // cbVersion
             // 
             this.cbVersion.FormattingEnabled = true;
-            this.cbVersion.Location = new System.Drawing.Point(538, 257);
+            this.cbVersion.Location = new System.Drawing.Point(11, 417);
             this.cbVersion.Name = "cbVersion";
             this.cbVersion.Size = new System.Drawing.Size(188, 21);
             this.cbVersion.TabIndex = 18;

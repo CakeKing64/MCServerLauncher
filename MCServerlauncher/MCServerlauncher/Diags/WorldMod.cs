@@ -209,7 +209,7 @@ namespace MCServerLauncher
                 {
                     foreach (object obj in lstWorlds.SelectedItems)
                     {
-                        Program.THANOS_SNAP(svdir + "/" + obj.ToString());
+                        Program.DELETE_FILES(svdir + "/" + obj.ToString());
                         Directory.Delete(svdir + "/" + obj.ToString());
                     }
                 }
@@ -217,7 +217,7 @@ namespace MCServerLauncher
                 {
                     foreach (object obj in lstBackups.SelectedItems)
                     {
-                        Program.THANOS_SNAP(svdir + "/world_backups/" + obj.ToString());
+                        Program.DELETE_FILES(svdir + "/world_backups/" + obj.ToString());
                         Directory.Delete(svdir + "/world_backups/" + obj.ToString());
                     }
                 }
@@ -271,7 +271,7 @@ namespace MCServerLauncher
 
                 if (res == DialogResult.Yes)
                 {
-                    Program.THANOS_SNAP(svdir + "\\world_backups\\" + worldn);
+                    Program.DELETE_FILES(svdir + "\\world_backups\\" + worldn);
                     ovr = 2; // 2 is unused but it looks like i'm doing work :)
                 }
                 if (res == DialogResult.No)
@@ -315,7 +315,7 @@ namespace MCServerLauncher
 
                 if (res == DialogResult.Yes)
                 {
-                    Program.THANOS_SNAP(svdir + "\\" + worldn);
+                    Program.DELETE_FILES(svdir + "\\" + worldn);
                     ovr = 2; // 2 is unused but it looks like i'm doing work :)
                 }
                 if (res == DialogResult.No)
@@ -359,7 +359,7 @@ namespace MCServerLauncher
 
                 if (res == DialogResult.Yes)
                 {
-                    Program.THANOS_SNAP(svdir + "\\world_backups\\" + worldn);
+                    Program.DELETE_FILES(svdir + "\\world_backups\\" + worldn);
                     ovr = 2; // 2 is unused but it looks like i'm doing work :)
                 }
                 if (res == DialogResult.No)
@@ -402,7 +402,7 @@ namespace MCServerLauncher
 
                 if (res == DialogResult.Yes)
                 {
-                    Program.THANOS_SNAP(svdir + "\\" + worldn);
+                    Program.DELETE_FILES(svdir + "\\" + worldn);
                     ovr = 2; // 2 is unused but it looks like i'm doing work :)
                 }
                 if (res == DialogResult.No)
@@ -449,7 +449,7 @@ namespace MCServerLauncher
 
                 if (res == DialogResult.Yes)
                 {
-                    Program.THANOS_SNAP(svdir + "\\" + worldx);
+                    Program.DELETE_FILES(svdir + "\\" + worldx);
                     ovr = 2; // 2 is unused but it looks like i'm doing work :)
                 }
                 if (res == DialogResult.No)
@@ -543,6 +543,47 @@ namespace MCServerLauncher
                     DuplicateWorld(obj.ToString());
 
             RefreshWorlds();
+        }
+
+        void create_empty_world(string folder_name)
+        {
+            Directory.CreateDirectory(folder_name);
+            Directory.CreateDirectory(folder_name + "\\datapacks");
+            Directory.CreateDirectory(folder_name + "\\region");
+            Directory.CreateDirectory(folder_name + "\\playerdata");
+            Directory.CreateDirectory(folder_name + "\\data");
+        }
+        private void btnNewWorld_Click(object sender, EventArgs e)
+        {
+            if (!BackupMode)
+            {
+                string st = "New World";
+                int ind = 1;
+                bool __world_exists = false;
+                if (Directory.Exists(svdir + "/" + st))
+                {
+                    __world_exists = true;
+                    while (Directory.Exists(svdir + "/" + st + " (" + ind + ")"))
+                        ind++;
+                }
+                if (__world_exists)
+                    st = st + " (" + ind + ")";
+
+                Diags.diagRename dr = new Diags.diagRename(st);
+                do
+                {
+                    dr.ShowDialog();
+                    if (Directory.Exists(svdir + "/" + dr.name))
+                        MessageBox.Show("World already exists!", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                } while (Directory.Exists(svdir + "/" + dr.name));
+                if (!dr.cancel)
+                {
+                    create_empty_world(svdir + "/" + dr.name);
+                    RefreshWorlds();
+                }
+                dr.Dispose();
+            }
+                
         }
     }
 }

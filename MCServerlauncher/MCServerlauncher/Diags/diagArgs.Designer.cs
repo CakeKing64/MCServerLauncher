@@ -32,6 +32,7 @@
             this.errorProvider1 = new System.Windows.Forms.ErrorProvider(this.components);
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.btnSave = new System.Windows.Forms.Button();
+            this.btnArgumentGenerator = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.errorProvider1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -60,11 +61,22 @@
             this.btnSave.KeyDown += new System.Windows.Forms.KeyEventHandler(this.BtnSave_KeyDown);
             this.btnSave.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.BtnSave_KeyPress);
             // 
+            // btnArgumentGenerator
+            // 
+            this.btnArgumentGenerator.Location = new System.Drawing.Point(240, 38);
+            this.btnArgumentGenerator.Name = "btnArgumentGenerator";
+            this.btnArgumentGenerator.Size = new System.Drawing.Size(127, 23);
+            this.btnArgumentGenerator.TabIndex = 2;
+            this.btnArgumentGenerator.Text = "Argument Generator";
+            this.btnArgumentGenerator.UseVisualStyleBackColor = true;
+            this.btnArgumentGenerator.Click += new System.EventHandler(this.btnArgumentGenerator_Click);
+            // 
             // diagArgs
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(461, 71);
+            this.Controls.Add(this.btnArgumentGenerator);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.textBox1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -84,5 +96,6 @@
         private System.Windows.Forms.ErrorProvider errorProvider1;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button btnArgumentGenerator;
     }
 }

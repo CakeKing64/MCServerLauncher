@@ -798,7 +798,7 @@ namespace MCServerLauncher
                 Directory.SetCurrentDirectory("BuildTools/" + ver);
                 if (Directory.Exists("BuildData"))
                 {
-                    THANOS_SNAP("BuildData");
+                    DELETE_FILES("BuildData");
                 }
                 ProcessStartInfo a = new ProcessStartInfo(sJavaPath + "/java", "-jar BuildTools.jar --rev " + ver);
                 
@@ -832,7 +832,7 @@ namespace MCServerLauncher
 
 
 
-        public static void THANOS_SNAP(string dir)
+        public static void DELETE_FILES(string dir)
         {
 
             try
@@ -841,7 +841,7 @@ namespace MCServerLauncher
                     File.Delete(file);
                 foreach (string sdir in Directory.GetDirectories(dir))
                 {
-                    THANOS_SNAP(sdir);
+                    DELETE_FILES(sdir);
                     Directory.Delete(sdir);
                 }
             }
