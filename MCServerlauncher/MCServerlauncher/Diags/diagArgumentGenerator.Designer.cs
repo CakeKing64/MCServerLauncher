@@ -34,8 +34,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.tbMinMemory = new System.Windows.Forms.TextBox();
             this.tbMaxMemory = new System.Windows.Forms.TextBox();
-            this.chkOnlineMode = new System.Windows.Forms.CheckBox();
             this.chkUseGUI = new System.Windows.Forms.CheckBox();
+            this.chkOnlineMode = new System.Windows.Forms.CheckBox();
             this.cmbMinTYPE = new System.Windows.Forms.ComboBox();
             this.cmbMaxTYPE = new System.Windows.Forms.ComboBox();
             this.btnDone = new System.Windows.Forms.Button();
@@ -99,28 +99,28 @@
             this.tbMaxMemory.TabIndex = 5;
             this.tbMaxMemory.Text = "1024";
             // 
-            // chkOnlineMode
-            // 
-            this.chkOnlineMode.AutoSize = true;
-            this.chkOnlineMode.Checked = true;
-            this.chkOnlineMode.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkOnlineMode.Location = new System.Drawing.Point(125, 87);
-            this.chkOnlineMode.Name = "chkOnlineMode";
-            this.chkOnlineMode.Size = new System.Drawing.Size(15, 14);
-            this.chkOnlineMode.TabIndex = 6;
-            this.chkOnlineMode.UseVisualStyleBackColor = true;
-            // 
             // chkUseGUI
             // 
             this.chkUseGUI.AutoSize = true;
             this.chkUseGUI.Checked = true;
             this.chkUseGUI.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkUseGUI.Location = new System.Drawing.Point(125, 113);
+            this.chkUseGUI.Location = new System.Drawing.Point(125, 87);
             this.chkUseGUI.Name = "chkUseGUI";
             this.chkUseGUI.Size = new System.Drawing.Size(15, 14);
-            this.chkUseGUI.TabIndex = 7;
+            this.chkUseGUI.TabIndex = 6;
             this.chkUseGUI.UseVisualStyleBackColor = true;
-            this.chkUseGUI.Visible = false;
+            // 
+            // chkOnlineMode
+            // 
+            this.chkOnlineMode.AutoSize = true;
+            this.chkOnlineMode.Checked = true;
+            this.chkOnlineMode.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkOnlineMode.Location = new System.Drawing.Point(125, 113);
+            this.chkOnlineMode.Name = "chkOnlineMode";
+            this.chkOnlineMode.Size = new System.Drawing.Size(15, 14);
+            this.chkOnlineMode.TabIndex = 7;
+            this.chkOnlineMode.UseVisualStyleBackColor = true;
+            this.chkOnlineMode.Visible = false;
             // 
             // cmbMinTYPE
             // 
@@ -148,7 +148,7 @@
             // 
             // btnDone
             // 
-            this.btnDone.Location = new System.Drawing.Point(280, 132);
+            this.btnDone.Location = new System.Drawing.Point(199, 132);
             this.btnDone.Name = "btnDone";
             this.btnDone.Size = new System.Drawing.Size(75, 23);
             this.btnDone.TabIndex = 10;
@@ -158,7 +158,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(199, 132);
+            this.button1.Location = new System.Drawing.Point(280, 132);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 11;
@@ -175,8 +175,8 @@
             this.Controls.Add(this.btnDone);
             this.Controls.Add(this.cmbMaxTYPE);
             this.Controls.Add(this.cmbMinTYPE);
-            this.Controls.Add(this.chkUseGUI);
             this.Controls.Add(this.chkOnlineMode);
+            this.Controls.Add(this.chkUseGUI);
             this.Controls.Add(this.tbMaxMemory);
             this.Controls.Add(this.tbMinMemory);
             this.Controls.Add(this.label4);
@@ -201,8 +201,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox tbMinMemory;
         private System.Windows.Forms.TextBox tbMaxMemory;
-        private System.Windows.Forms.CheckBox chkOnlineMode;
         private System.Windows.Forms.CheckBox chkUseGUI;
+        private System.Windows.Forms.CheckBox chkOnlineMode;
         private System.Windows.Forms.ComboBox cmbMinTYPE;
         private System.Windows.Forms.ComboBox cmbMaxTYPE;
         private System.Windows.Forms.Button btnDone;

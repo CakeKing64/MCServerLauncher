@@ -67,7 +67,7 @@ namespace MCServerLauncher.Diags
         {
             _args = "-Xmx" + tbMaxMemory.Text + (cmbMaxTYPE.Text.ToLower() == "mb" ? "m" : cmbMaxTYPE.Text.ToLower() == "gb" ? "g" : "m")
                 + " -Xms" + tbMinMemory.Text + (cmbMinTYPE.Text.ToLower() == "mb" ? "m" : cmbMinTYPE.Text.ToLower() == "gb" ? "g" : "m")
-                + " -jar sever.jar "
+                + " -jar server.jar "
                 + (chkUseGUI.Checked ? "" : "nogui");
             /*
                 + " -o "
