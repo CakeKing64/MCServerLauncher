@@ -53,6 +53,8 @@ namespace MCServerLauncher
         public static bool bCloseOnServerLaunch = false;
         public static bool bUseGlobalLaunchArgs = false;
         public static bool bAskedGit = false;
+
+        public static int iJavaType = 32; // 32 || 64 bit version of java being used
         static string GetLatest()
         {
             return sLatestVersion;
@@ -61,6 +63,8 @@ namespace MCServerLauncher
         public static void launch(string stype, string vnumb)
         {
             bool has_jar = false;
+
+            
             if (Directory.Exists("Servers/" + stype + "/" + vnumb))
                 {
                 
@@ -80,7 +84,7 @@ namespace MCServerLauncher
             if (!File.Exists("Servers/" + stype + "/" + vnumb + "/server.json"))
             {
                 var set = new JObject();
-                set["sLaunchArgs"] = "-Xmx1024M -Xms1024M -jar server.jar";
+                set["sLaunchArgs"] = "-Xmx1024M -Xms1024M " + (iJavaType == 64 ? "-d64 " : "") + "-jar server.jar";
                 File.WriteAllText("Servers/" + stype + "/" + vnumb + "/server.json", set.ToString());
             }
             var job = JObject.Parse(File.ReadAllText("Servers/" + stype + "/" + vnumb + "/server.json"));
@@ -90,7 +94,15 @@ namespace MCServerLauncher
             sQLaunchSVersion = vnumb;
             SaveSettings();
             Directory.SetCurrentDirectory("Servers/" + stype + "/" + vnumb);
-            ProcessStartInfo a = new ProcessStartInfo(sJavaPath + "/java.exe", job["sLaunchArgs"].ToString());
+
+            // 64 bit java remover thingy
+            string largs = job["sLaunchArgs"].ToString();
+            if(iJavaType == 32)
+            if (largs.Contains("-d64"))
+                largs = largs.Remove(largs.IndexOf("-d64"), 4);
+
+            ProcessStartInfo a = new ProcessStartInfo(sJavaPath + "/java.exe",largs );
+
            // a.RedirectStandardOutput = true;
            //a.UseShellExecute = false;
             System.Diagnostics.Process.Start(a);
@@ -211,18 +223,19 @@ namespace MCServerLauncher
                             goto _java_check_end;
                         }
 
-                } catch
+                }
+                catch
                 { }
                 string path = Environment.GetEnvironmentVariable("Path");
-               
+
                 string[] paths = path.Split(';');
-                foreach(string sDir in paths)
+                foreach (string sDir in paths)
                 {
                     if (sDir != "")
                     {
                         var add = sDir[sDir.Length - 1] == '/' ? "" : "/";
 
-                       
+
                         if (Directory.Exists(sDir))
                             if (Directory.Exists(sDir + add + "bin"))
                                 if (File.Exists(sDir + add + "bin\\java.exe"))
@@ -235,11 +248,11 @@ namespace MCServerLauncher
                         }
                     }
                 }
-               
+
                 if (sJavaPath == null)
                 {
                     string jpath = Environment.GetEnvironmentVariable("JAVA_HOME");
-                    
+
                     if (jpath == null)
                     {
                         while (true)
@@ -259,7 +272,7 @@ namespace MCServerLauncher
                                         if (File.Exists(fbdDialog.SelectedPath + "/bin/java.exe"))
                                         {
                                             sJavaPath = fbdDialog.SelectedPath + "\\bin";
-                                           // Environment.SetEnvironmentVariable("Path", Environment.GetEnvironmentVariable("Path") + ";" + sJavaPath);
+                                            // Environment.SetEnvironmentVariable("Path", Environment.GetEnvironmentVariable("Path") + ";" + sJavaPath);
                                             break;
                                         }
                                     if (File.Exists(fbdDialog.SelectedPath + "java.exe"))
@@ -287,9 +300,40 @@ namespace MCServerLauncher
                         sJavaPath = jpath + "\\";
                     }
                 }
-                _java_check_end:
+            _java_check_end:
+
+                var f = File.Open(sJavaPath + "\\java.exe", FileMode.Open, FileAccess.Read);
+
+                // 64 / 32 bit check
+                byte[] buffer = new byte[2];
+                while (true)
+                { 
+                
+
+                f.Read(buffer, 0, 2);
+
+                    if (buffer[0] == 'P' && buffer[1] == 'E')
+                        break;
+
+                    if (f.Position + 2 >= f.Length)
+                        break;
+
+                 f.Seek(2, SeekOrigin.Current);
+
+                    
+                }
+                f.Seek(2, SeekOrigin.Current);
+                f.Read(buffer,0,2);
+                if (buffer[0] == 100 && buffer[1] == 134)
+                    iJavaType = 64;
+                else if (buffer[0] == 0x4c && buffer[1] == 1)
+                    iJavaType = 32;
+                else
+                    iJavaType = 16; // Invalid java probably
+
                 SaveSettings();
             }
+
             Console.Clear();
 
             /*

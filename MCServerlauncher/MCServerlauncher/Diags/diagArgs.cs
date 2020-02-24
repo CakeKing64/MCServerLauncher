@@ -85,7 +85,7 @@ namespace MCServerLauncher
 
         private void btnArgumentGenerator_Click(object sender, EventArgs e)
         {
-            Diags.diagArgumentGenerator dag = new Diags.diagArgumentGenerator(_args);
+            Diags.diagArgumentGenerator dag = new Diags.diagArgumentGenerator(textBox1.Text);
             dag.ShowDialog();
             
             if (dag._args != "CLOSED")

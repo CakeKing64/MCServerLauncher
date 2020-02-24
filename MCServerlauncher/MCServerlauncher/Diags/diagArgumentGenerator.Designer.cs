@@ -30,16 +30,17 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
+            this.lbl64Bit = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.tbMinMemory = new System.Windows.Forms.TextBox();
             this.tbMaxMemory = new System.Windows.Forms.TextBox();
             this.chkUseGUI = new System.Windows.Forms.CheckBox();
-            this.chkOnlineMode = new System.Windows.Forms.CheckBox();
+            this.chkX64 = new System.Windows.Forms.CheckBox();
             this.cmbMinTYPE = new System.Windows.Forms.ComboBox();
             this.cmbMaxTYPE = new System.Windows.Forms.ComboBox();
             this.btnDone = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.btnAdv = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // label1
@@ -62,16 +63,15 @@
             this.label2.TabIndex = 1;
             this.label2.Text = "Max. Memory";
             // 
-            // label3
+            // lbl64Bit
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Noto Mono", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(12, 110);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(107, 18);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Online Mode";
-            this.label3.Visible = false;
+            this.lbl64Bit.AutoSize = true;
+            this.lbl64Bit.Font = new System.Drawing.Font("Noto Mono", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lbl64Bit.Location = new System.Drawing.Point(12, 110);
+            this.lbl64Bit.Name = "lbl64Bit";
+            this.lbl64Bit.Size = new System.Drawing.Size(80, 18);
+            this.lbl64Bit.TabIndex = 2;
+            this.lbl64Bit.Text = "x64 Mode";
             // 
             // label4
             // 
@@ -110,17 +110,16 @@
             this.chkUseGUI.TabIndex = 6;
             this.chkUseGUI.UseVisualStyleBackColor = true;
             // 
-            // chkOnlineMode
+            // chkX64
             // 
-            this.chkOnlineMode.AutoSize = true;
-            this.chkOnlineMode.Checked = true;
-            this.chkOnlineMode.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkOnlineMode.Location = new System.Drawing.Point(125, 113);
-            this.chkOnlineMode.Name = "chkOnlineMode";
-            this.chkOnlineMode.Size = new System.Drawing.Size(15, 14);
-            this.chkOnlineMode.TabIndex = 7;
-            this.chkOnlineMode.UseVisualStyleBackColor = true;
-            this.chkOnlineMode.Visible = false;
+            this.chkX64.AutoSize = true;
+            this.chkX64.Checked = true;
+            this.chkX64.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkX64.Location = new System.Drawing.Point(125, 113);
+            this.chkX64.Name = "chkX64";
+            this.chkX64.Size = new System.Drawing.Size(15, 14);
+            this.chkX64.TabIndex = 7;
+            this.chkX64.UseVisualStyleBackColor = true;
             // 
             // cmbMinTYPE
             // 
@@ -166,21 +165,32 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // btnAdv
+            // 
+            this.btnAdv.Location = new System.Drawing.Point(12, 132);
+            this.btnAdv.Name = "btnAdv";
+            this.btnAdv.Size = new System.Drawing.Size(107, 23);
+            this.btnAdv.TabIndex = 12;
+            this.btnAdv.Text = "Advanced";
+            this.btnAdv.UseVisualStyleBackColor = true;
+            this.btnAdv.Click += new System.EventHandler(this.btnAdv_Click);
+            // 
             // diagArgumentGenerator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(366, 167);
+            this.Controls.Add(this.btnAdv);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btnDone);
             this.Controls.Add(this.cmbMaxTYPE);
             this.Controls.Add(this.cmbMinTYPE);
-            this.Controls.Add(this.chkOnlineMode);
+            this.Controls.Add(this.chkX64);
             this.Controls.Add(this.chkUseGUI);
             this.Controls.Add(this.tbMaxMemory);
             this.Controls.Add(this.tbMinMemory);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
+            this.Controls.Add(this.lbl64Bit);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -197,15 +207,16 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label lbl64Bit;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox tbMinMemory;
         private System.Windows.Forms.TextBox tbMaxMemory;
         private System.Windows.Forms.CheckBox chkUseGUI;
-        private System.Windows.Forms.CheckBox chkOnlineMode;
+        private System.Windows.Forms.CheckBox chkX64;
         private System.Windows.Forms.ComboBox cmbMinTYPE;
         private System.Windows.Forms.ComboBox cmbMaxTYPE;
         private System.Windows.Forms.Button btnDone;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnAdv;
     }
 }

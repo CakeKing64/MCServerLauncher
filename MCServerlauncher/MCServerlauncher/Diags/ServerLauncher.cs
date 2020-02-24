@@ -280,7 +280,6 @@ namespace MCServerLauncher
             btnQLaunch.Show();
             btnModifyProp.Show();
             btnLaunch.Show();
-            btnConsoleMode.Show();
             lblInstalled.Hide();
             btnManageWorlds.Hide();
             clbSType.Hide();
@@ -505,14 +504,18 @@ namespace MCServerLauncher
             if (!File.Exists(sPropDir + "/server.json"))
             {
                 var set = new JObject();
-                set["sLaunchArgs"] = "-Xmx1024M -Xms1024M -jar server.jar";
+                set["sLaunchArgs"] = "-Xmx1024M -Xms1024M " + (Program.iJavaType == 64 ? "-d64 " : "" ) +  "-jar server.jar";
                 File.WriteAllText(sPropDir + "/server.json", set.ToString());
             }
             var job = JObject.Parse(File.ReadAllText(sPropDir + "/server.json"));
-            var da = new diagArgs(job["sLaunchArgs"].ToString());
+            var da = new Diags.diagArgumentGenerator(job["sLaunchArgs"].ToString());
             da.ShowDialog();
-            job["sLaunchArgs"] = da._args;
-            File.WriteAllText(sPropDir + "/server.json", job.ToString());
+
+            if (da._args != null)
+            {
+                job["sLaunchArgs"] = da._args;
+                File.WriteAllText(sPropDir + "/server.json", job.ToString());
+            }
             da.Dispose();
         }
 
