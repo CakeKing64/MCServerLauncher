@@ -32,7 +32,7 @@ namespace MCServerLauncher
 
             if (Program.sQLaunchSType == "Vanilla")
             {
-                lbVersion.Items.Add("Latest");
+                //lbVersion.Items.Add("Latest");
                 clbSType.SetItemChecked(0, true);
             }
             else
@@ -214,8 +214,6 @@ namespace MCServerLauncher
         private void GetVersions(string stype)
         {
             lbVersion.Items.Clear();
-            if(stype == "Vanilla")
-            lbVersion.Items.Add("Latest");
             if (!Directory.Exists("Servers"))
                 Directory.CreateDirectory("Servers");
             if (!Directory.Exists("Servers/" + stype))

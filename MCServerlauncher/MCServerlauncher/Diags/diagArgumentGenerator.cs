@@ -49,14 +49,14 @@ namespace MCServerLauncher.Diags
                     if (arg.Substring(0, 4) == "-Xmx")
                     {
                         arg_max_mem = arg.Substring(4, arg.Length - 5);
-                        arg_max_mem_type = (arg[arg.Length - 1] == 'm' ? "MB" : "GB");
+                        arg_max_mem_type = (arg.ToLower()[arg.Length - 1] == 'm' ? "MB" : "GB");
                         bFoundArg = true;
                     }
                 if (arg.Length > 4)
                     if (arg.Substring(0,4) == "-Xms")
                 {
                         arg_min_mem = arg.Substring(4, arg.Length - 5);
-                        arg_min_mem_type = (arg[arg.Length - 1] == 'm' ? "MB" : "GB");
+                        arg_min_mem_type = (arg.ToLower()[arg.Length - 1] == 'm' ? "MB" : "GB");
                         bFoundArg = true;
 
 
@@ -126,6 +126,11 @@ namespace MCServerLauncher.Diags
             if (da._args != null)
                 load_args(da._args);
             da.Dispose();
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            load_args("-Xmx1024M -Xms1024M " + (Program.iJavaType == 64 ? "-d64 " : "") + "-jar server.jar");
         }
     }
 }

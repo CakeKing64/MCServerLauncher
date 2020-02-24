@@ -29,16 +29,17 @@ namespace MCServerLauncher
             return DownloadPos;
         }
 
+        public static class NativeMethods
+        {
+            [DllImport("kernel32.dll")]
+            public static extern IntPtr GetConsoleWindow();
 
-        [DllImport("kernel32.dll")]
-        static extern IntPtr GetConsoleWindow();
+            [DllImport("user32.dll")]
+            public static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
-        [DllImport("user32.dll")]
-        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
-
-        const int SW_HIDE = 0;
-        const int SW_SHOW = 5;
-
+            public const int SW_HIDE = 0;
+            public const int SW_SHOW = 5;
+        }
 
         // Settings
         public static bool bUseSingleDirectory = false;
@@ -144,6 +145,10 @@ namespace MCServerLauncher
 
         public static void TryLaunch(string stype, string version)
         {
+
+            if (stype.ToLower() == "latest")
+                MessageBox.Show("Using 'latest' is no longer supported");
+
             switch (stype.ToLower())
             {
                 case "vanilla":
@@ -429,8 +434,8 @@ namespace MCServerLauncher
 
             if (bUseGUI)
             {
-                var conHandle = GetConsoleWindow();
-                ShowWindow(conHandle, SW_HIDE);
+                var conHandle = NativeMethods.GetConsoleWindow();
+                NativeMethods.ShowWindow(conHandle, NativeMethods.SW_HIDE);
 
                 var slLauncher = new ServerLauncher();
 
@@ -550,8 +555,9 @@ namespace MCServerLauncher
                 return;
             Console.WriteLine("Server Version: " + str);
 
-            if (str == "latest")
-                str = GetLatest();
+            if (str.ToLower() == "latest")
+                MessageBox.Show("Using 'latest' is no longer supported");
+               // str = GetLatest();
 
             CheckServerF();
 
@@ -617,6 +623,9 @@ namespace MCServerLauncher
 
             }
         _beginning:
+            if (str.ToLower() == "latest")
+                MessageBox.Show("Using 'latest' is no longer supported");
+
 
             bUseLatest = str == "latest" || str == "Latest";
             if(redownload)
