@@ -708,7 +708,7 @@ namespace MCServerLauncher
                     File.Delete(str + ".json");
                     o = JObject.Parse(s);
                     tServer = o["downloads"]["server"];
-                    if(bSnapshot)
+                    if(false && bSnapshot)
                     {
                         var c = JObject.Parse(File.ReadAllText("Servers/Vanilla/snapshot_parents.json"));
                         c[str] = o["assets"].ToString();
