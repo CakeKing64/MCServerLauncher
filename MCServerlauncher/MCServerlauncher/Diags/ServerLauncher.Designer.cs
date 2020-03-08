@@ -54,6 +54,7 @@
             this.iml0 = new System.Windows.Forms.ImageList(this.components);
             this.ofdServerIcon = new System.Windows.Forms.OpenFileDialog();
             this.btnServerIcon = new System.Windows.Forms.Button();
+            this.btnModDefault = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.picServerIcon)).BeginInit();
             this.SuspendLayout();
             // 
@@ -98,6 +99,7 @@
             this.lbVersion.TabIndex = 4;
             this.lbVersion.Visible = false;
             this.lbVersion.SelectedIndexChanged += new System.EventHandler(this.LbVersion_SelectedIndexChanged);
+            this.lbVersion.DoubleClick += new System.EventHandler(this.lbVersion_DoubleClick);
             // 
             // tbVersion
             // 
@@ -288,6 +290,7 @@
             this.picServerIcon.TabIndex = 22;
             this.picServerIcon.TabStop = false;
             this.picServerIcon.Visible = false;
+            this.picServerIcon.Click += new System.EventHandler(this.picServerIcon_Click);
             // 
             // iml0
             // 
@@ -312,11 +315,23 @@
             this.btnServerIcon.Visible = false;
             this.btnServerIcon.Click += new System.EventHandler(this.btnServerIcon_Click);
             // 
+            // btnModDefault
+            // 
+            this.btnModDefault.Location = new System.Drawing.Point(654, 160);
+            this.btnModDefault.Name = "btnModDefault";
+            this.btnModDefault.Size = new System.Drawing.Size(134, 23);
+            this.btnModDefault.TabIndex = 24;
+            this.btnModDefault.Text = "Modify default settings";
+            this.btnModDefault.UseVisualStyleBackColor = true;
+            this.btnModDefault.Visible = false;
+            this.btnModDefault.Click += new System.EventHandler(this.btnModDefault_Click);
+            // 
             // ServerLauncher
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.btnModDefault);
             this.Controls.Add(this.btnServerIcon);
             this.Controls.Add(this.picServerIcon);
             this.Controls.Add(this.btnExplorer);
@@ -377,5 +392,6 @@
         private System.Windows.Forms.ImageList iml0;
         private System.Windows.Forms.OpenFileDialog ofdServerIcon;
         private System.Windows.Forms.Button btnServerIcon;
+        private System.Windows.Forms.Button btnModDefault;
     }
 }

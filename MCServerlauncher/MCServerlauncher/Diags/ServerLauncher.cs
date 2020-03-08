@@ -28,15 +28,29 @@ namespace MCServerLauncher
         public ServerLauncher()
         {
             InitializeComponent();
+            if (!Directory.Exists("Servers"))
+                Directory.CreateDirectory("Servers");
 
-
-            if (Program.sQLaunchSType == "Vanilla")
+            foreach (string dir in Directory.GetDirectories("Servers"))
             {
-                //lbVersion.Items.Add("Latest");
-                clbSType.SetItemChecked(0, true);
+                if (dir.Substring(8).ToLower() != "vanilla" && dir.Substring(8).ToLower() != "spigot")
+                    clbSType.Items.Add(dir.Substring(8));
             }
-            else
-                clbSType.SetItemChecked(1, true);
+
+            bool itemSet = false;
+            for(int i = 0; i < clbSType.Items.Count;i++)
+                if (clbSType.Items[i].ToString() == Program.sQLaunchSType)
+                {
+                    clbSType.SetItemChecked(clbSType.Items.IndexOf(clbSType.Items[i]), true);
+                    itemSet = true;
+                }
+
+            // default to vanilla
+
+            if(!itemSet)
+            clbSType.SetItemChecked(0, true);
+
+
             tbVersion.Text = Program.sQLaunchSVersion;
             ignoreCheck = false;
             bReady = true;
@@ -53,7 +67,7 @@ namespace MCServerLauncher
         {
             Console.WriteLine("Select a version, or type one in");
 
-            TbVersion_TextChanged(tbVersion, null);
+            
 
             btnQLaunch.Hide();
             btnModifyProp.Hide();
@@ -71,6 +85,7 @@ namespace MCServerLauncher
             chkCOSL.Checked = Program.bCloseOnServerLaunch;
             btnVersionList.Show();
             btnQuit.Hide();
+            TbVersion_TextChanged(tbVersion, null);
             //Program.start_server_vanilla("1.8.6");
         }
 
@@ -148,6 +163,12 @@ namespace MCServerLauncher
                         GetVersions("Spigot");
                         break;
 
+                    default:
+                        Program.launch(clbSType.CheckedItems[0].ToString(), tbVersion.Text);
+                        GetVersions(clbSType.CheckedItems[0].ToString());
+
+                        break;
+
                 }
             }
             else
@@ -179,7 +200,9 @@ namespace MCServerLauncher
                 return;
             }
             ignoreCheck = true;
-            
+
+            GetVersions(clb.GetItemText(clb.Items[e.Index]));
+            /*
             if (e.NewValue == CheckState.Checked)
             {
                 if (e.Index == 0)
@@ -196,8 +219,14 @@ namespace MCServerLauncher
                 }
             }
 
-           
+           */
 
+            if (e.NewValue == CheckState.Checked)
+            {
+                for (int i = 0; i < clb.Items.Count; i++)
+                    if (i != e.Index)
+                        clb.SetItemChecked(i, false);
+            }
             
 
         }
@@ -268,6 +297,7 @@ namespace MCServerLauncher
             btnExplorer.Show();
             btnServerIcon.Show();
             picServerIcon.Show();
+            btnModDefault.Show();
             TbVersion_TextChanged(tbVersion, null);
         }
 
@@ -284,6 +314,7 @@ namespace MCServerLauncher
             lbVersion.Hide();
             tbVersion.Hide();
             btnLaunchS.Hide();
+            btnModDefault.Hide();
             btnExplorer.Enabled = true;
             btnLaunchS.Enabled = true;
             btnArgumentEditor.Enabled = true;
@@ -453,6 +484,9 @@ namespace MCServerLauncher
         {
             CheckQLaunch();
             picServerIcon.Image = iml0.Images[0];
+
+
+
            
         }
 
@@ -499,6 +533,11 @@ namespace MCServerLauncher
         private void Button1_Click_4(object sender, EventArgs e)
         {
             var sPropDir = "Servers/" + clbSType.CheckedItems[0].ToString() + "/" + tbVersion.Text;
+
+            if (!Directory.Exists("Servers/" + clbSType.CheckedItems[0].ToString() + "/" + tbVersion.Text))
+                {
+                return;
+            }
             if (!File.Exists(sPropDir + "/server.json"))
             {
                 var set = new JObject();
@@ -562,6 +601,23 @@ namespace MCServerLauncher
         private void lblQLaunch_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void picServerIcon_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnModDefault_Click(object sender, EventArgs e)
+        {
+            var propedit = new PropertiesEditor(".\\","default.properties");
+            propedit.Text = "Properties Editor - Default Settings";
+            propedit.ShowDialog();
+        }
+
+        private void lbVersion_DoubleClick(object sender, EventArgs e)
+        {
+            Button3_Click(null, null);
         }
     }
 

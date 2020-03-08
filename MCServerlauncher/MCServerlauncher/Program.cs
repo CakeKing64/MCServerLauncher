@@ -64,31 +64,32 @@ namespace MCServerLauncher
         public static void launch(string stype, string vnumb)
         {
             bool has_jar = false;
+            string server_path = "Servers/" + stype + "/" + vnumb;
 
-            
-            if (Directory.Exists("Servers/" + stype + "/" + vnumb))
+
+            if (Directory.Exists(server_path))
                 {
                 
-                string[] files = Directory.GetFiles(GetSDV() + vnumb);
+                string[] files = Directory.GetFiles(server_path);
                 foreach (string file in files)
                 {
                     if (Path.GetExtension(file) == ".jar")
                         has_jar = true;
                 }
             }
-            if (!Directory.Exists("Servers/" + stype + "/"  + vnumb) && has_jar)
+            if (!Directory.Exists(server_path) && has_jar)
             {
                 Console.WriteLine("Unable to launch " + stype + " / " + vnumb);
                 return;
             }
 
-            if (!File.Exists("Servers/" + stype + "/" + vnumb + "/server.json"))
+            if (!File.Exists(server_path + "/server.json"))
             {
                 var set = new JObject();
                 set["sLaunchArgs"] = "-Xmx1024M -Xms1024M " + (iJavaType == 64 ? "-d64 " : "") + "-jar server.jar";
-                File.WriteAllText("Servers/" + stype + "/" + vnumb + "/server.json", set.ToString());
+                File.WriteAllText(server_path + "/server.json", set.ToString());
             }
-            var job = JObject.Parse(File.ReadAllText("Servers/" + stype + "/" + vnumb + "/server.json"));
+            var job = JObject.Parse(File.ReadAllText(server_path + "/server.json"));
 
 
             sQLaunchSType = stype;
@@ -742,8 +743,11 @@ namespace MCServerLauncher
 
                     Directory.CreateDirectory(GetSDV() + str);
                     File.WriteAllText(GetSDV() + str + "/eula.txt", "eula = " + bReadEULA.ToString());
-                    File.WriteAllText(GetSDV() + str + "/server.properties", new ServerProperties().ToString());
-
+                    if (!File.Exists("default.properties"))
+                        File.WriteAllText(GetSDV() + str + "/server.properties", new ServerProperties().ToString());
+                    else
+                        if(!File.Exists(GetSDV() + str + "/server.properties"))
+                            File.Copy("default.properties",GetSDV() + str + "/server.properties");
                     string check = tServer["url"].ToString();
 
                     Console.Write("Downloading server.jar ");
@@ -875,7 +879,7 @@ namespace MCServerLauncher
             }
 
             if(!File.Exists("Servers/Spigot/" + ver + "/eula.txt")) File.WriteAllText("Servers/Spigot/" + ver + "/eula.txt", "eula=" + bReadEULA.ToString().ToLower());
-            if (!File.Exists("Servers/Spigot/" + ver + "/server.properties")) File.WriteAllText("Servers/Spigot/" + ver + "/server.properties", new ServerProperties().ToString());
+            if (!File.Exists("Servers/Spigot/" + ver + "/server.properties")) if (File.Exists("default.properties")) File.Copy("default.properties", "Servers/Spigot/" + ver + "/server.properties"); else File.WriteAllText("Servers/Spigot/" + ver + "/server.properties", new ServerProperties().ToString());
             launch("Spigot", ver);
         }
         #endregion
@@ -948,7 +952,7 @@ namespace MCServerLauncher
 
         public ServerProperties()
         {
-            ServerVars["announce-player-achievements"] = new SPropSetting(null, 1);
+            ServerVars["announce-player-achievements"] = new SPropSetting("true", 2);
             ServerVars["allow-flight"] = new SPropSetting("false",2);
             ServerVars["allow-nether"] = new SPropSetting("true",2);
             ServerVars["broadcast-console-to-ops"] = new SPropSetting("true", 2);
