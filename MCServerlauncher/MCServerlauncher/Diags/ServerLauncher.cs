@@ -617,6 +617,7 @@ namespace MCServerLauncher
 
         private void lbVersion_DoubleClick(object sender, EventArgs e)
         {
+            if(lbVersion.SelectedIndex != -1)
             Button3_Click(null, null);
         }
     }
