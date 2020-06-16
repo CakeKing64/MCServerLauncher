@@ -54,11 +54,8 @@
             this.iml0 = new System.Windows.Forms.ImageList(this.components);
             this.ofdServerIcon = new System.Windows.Forms.OpenFileDialog();
             this.btnServerIcon = new System.Windows.Forms.Button();
-<<<<<<< HEAD
             this.label1 = new System.Windows.Forms.Label();
-=======
             this.btnModDefault = new System.Windows.Forms.Button();
->>>>>>> b1125c68173d7dd27d32a7cd610d9f898389397e
             ((System.ComponentModel.ISupportInitialize)(this.picServerIcon)).BeginInit();
             this.SuspendLayout();
             // 
@@ -319,7 +316,6 @@
             this.btnServerIcon.Visible = false;
             this.btnServerIcon.Click += new System.EventHandler(this.btnServerIcon_Click);
             // 
-<<<<<<< HEAD
             // label1
             // 
             this.label1.AutoSize = true;
@@ -328,7 +324,6 @@
             this.label1.Size = new System.Drawing.Size(69, 13);
             this.label1.TabIndex = 24;
             this.label1.Text = "Version 1.0.1";
-=======
             // btnModDefault
             // 
             this.btnModDefault.Location = new System.Drawing.Point(654, 160);
@@ -339,18 +334,14 @@
             this.btnModDefault.UseVisualStyleBackColor = true;
             this.btnModDefault.Visible = false;
             this.btnModDefault.Click += new System.EventHandler(this.btnModDefault_Click);
->>>>>>> b1125c68173d7dd27d32a7cd610d9f898389397e
             // 
             // ServerLauncher
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-<<<<<<< HEAD
             this.Controls.Add(this.label1);
-=======
             this.Controls.Add(this.btnModDefault);
->>>>>>> b1125c68173d7dd27d32a7cd610d9f898389397e
             this.Controls.Add(this.btnServerIcon);
             this.Controls.Add(this.picServerIcon);
             this.Controls.Add(this.btnExplorer);
@@ -412,10 +403,7 @@
         private System.Windows.Forms.ImageList iml0;
         private System.Windows.Forms.OpenFileDialog ofdServerIcon;
         private System.Windows.Forms.Button btnServerIcon;
-<<<<<<< HEAD
         private System.Windows.Forms.Label label1;
-=======
         private System.Windows.Forms.Button btnModDefault;
->>>>>>> b1125c68173d7dd27d32a7cd610d9f898389397e
     }
 }
