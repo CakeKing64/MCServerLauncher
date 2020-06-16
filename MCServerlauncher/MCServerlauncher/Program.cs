@@ -54,6 +54,8 @@ namespace MCServerLauncher
         public static bool bCloseOnServerLaunch = false;
         public static bool bUseGlobalLaunchArgs = false;
         public static bool bAskedGit = false;
+        public static bool bForceEnable64Bit = false;
+        public static bool bForceJavaPath = false;
 
         public static int iJavaType = 32; // 32 || 64 bit version of java being used
         static string GetLatest()
@@ -98,7 +100,7 @@ namespace MCServerLauncher
 
             // 64 bit java remover thingy
             string largs = job["sLaunchArgs"].ToString();
-            if(iJavaType == 32)
+            if(iJavaType == 32 && !bForceEnable64Bit)
             if (largs.Contains("-d64"))
                 largs = largs.Remove(largs.IndexOf("-d64"), 4);
 
@@ -134,6 +136,8 @@ namespace MCServerLauncher
             job["sJavaPath"] = sJavaPath;
             job["bCloseOnServerLaunch"] = bCloseOnServerLaunch;
             job["bFirstStart"] = bFirstStart;
+            job["bForceEnable64Bit"] = bForceEnable64Bit;
+            job["bForceJavaPath"] = bForceJavaPath;
             //job["bAskedGit"] = bAskedGit;
             File.WriteAllText("settings.json", job.ToString());
         }
@@ -192,6 +196,8 @@ namespace MCServerLauncher
                 bUseGUI = true;//job["bUseGUI"] != null ? bool.Parse(job["bUseGUI"].ToString()) : false;
                 bCloseOnServerLaunch = job["bCloseOnServerLaunch"] != null ? bool.Parse(job["bCloseOnServerLaunch"].ToString()) : false;
                 bFirstStart = job["bFirstStart"] != null ? bool.Parse(job["bFirstStart"].ToString()) : true;
+                bForceEnable64Bit = job["bForceEnable64Bit"] != null ? bool.Parse(job["bForceEnable64Bit"].ToString()) : false;
+                bForceJavaPath = job["bForceJavaPath"] != null ? bool.Parse(job["bForceJavaPath"].ToString()) : false;
                 //bAskedGit = job["bAskedGit"] != null ? bool.Parse(job["bAskedGit"].ToString()) : false;
             }
           
@@ -222,7 +228,7 @@ namespace MCServerLauncher
                 try
                 {
                     if (Directory.Exists("C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"))
-                        if (File.Exists("C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath"))
+                        if (File.Exists("C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath\\java.exe"))
                         {
                             sJavaPath = "C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath";
                             goto _java_check_end;
@@ -335,7 +341,7 @@ namespace MCServerLauncher
                     iJavaType = 32;
                 else
                     iJavaType = 16; // Invalid java probably
-
+                f.Close();
                 SaveSettings();
             }
 
@@ -443,7 +449,7 @@ namespace MCServerLauncher
                 return;
             }
 
-            Console.Title = "MCServerLauncher 1.0";
+            Console.Title = "MCServerLauncher 1.0.1";
             while (true)
             {
                 
@@ -708,8 +714,10 @@ namespace MCServerLauncher
                     File.Delete(str + ".json");
                     o = JObject.Parse(s);
                     tServer = o["downloads"]["server"];
-                    if(false && bSnapshot)
+                    if(bSnapshot)
                     {
+                        if (!File.Exists("Servers/Vanilla/snapshot_parents.json"))
+                            File.WriteAllText("Servers/Vanilla/snapshot_parents.json","{}");
                         var c = JObject.Parse(File.ReadAllText("Servers/Vanilla/snapshot_parents.json"));
                         c[str] = o["assets"].ToString();
                         File.WriteAllText("Servers/Vanilla/snapshot_parents.json", c.ToString());
@@ -811,7 +819,11 @@ namespace MCServerLauncher
 
             ver = version;
 
-            // Download build tools first
+            if (Directory.Exists("Servers/Spigot/" + ver) || File.Exists("Servers/Spigot/" + ver + "/server.jar"))
+                goto post_buildtools;
+
+
+                // Download build tools first
             if (!Directory.Exists("BuildTools"))
             {
                 Directory.CreateDirectory("BuildTools");
@@ -821,10 +833,28 @@ namespace MCServerLauncher
 
             if (!File.Exists("BuildTools/" + version + "/BuildTools.jar"))
             {
+                if (File.Exists("BuildTools/BuildTools.jar"))
+                {
+                    File.Copy("BuildTools/BuildTools.jar", "BuildTools/" + version + "/BuildTools.jar");
+                    goto pb0;
+                }
                 Console.WriteLine("Downloading BuildTools...");
+                try
+                { 
                 client.DownloadFile("https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar", "BuildTools/" + version + "/BuildTools.jar");
+                }
+                catch (WebException e)
+                {
+                    MessageBox.Show("Failed to download BuildTools.jar:\n" + e.Message);
+                    MessageBox.Show("Opening web browser to download BuildTools.jar\nPlace it in the BuildTools folder");
+                    ProcessStartInfo a = new ProcessStartInfo("https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar");
+                    Process.Start(a);
+                    return;
+                }
                 Console.Clear();
             }
+
+            pb0:
 
             if (!bUseGUI)
             {
@@ -846,6 +876,7 @@ namespace MCServerLauncher
             Console.WriteLine("Server Version: " + ver);
 
             
+            post_buildtools:
                 if (!Directory.Exists("Servers/Spigot/" + ver) || !File.Exists("Servers/Spigot/" + ver + "/server.jar"))
             {
                 Directory.SetCurrentDirectory("BuildTools/" + ver);

@@ -54,6 +54,7 @@
             this.iml0 = new System.Windows.Forms.ImageList(this.components);
             this.ofdServerIcon = new System.Windows.Forms.OpenFileDialog();
             this.btnServerIcon = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picServerIcon)).BeginInit();
             this.SuspendLayout();
             // 
@@ -312,11 +313,21 @@
             this.btnServerIcon.Visible = false;
             this.btnServerIcon.Click += new System.EventHandler(this.btnServerIcon_Click);
             // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(719, 420);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(69, 13);
+            this.label1.TabIndex = 24;
+            this.label1.Text = "Version 1.0.1";
+            // 
             // ServerLauncher
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.btnServerIcon);
             this.Controls.Add(this.picServerIcon);
             this.Controls.Add(this.btnExplorer);
@@ -339,6 +350,7 @@
             this.Controls.Add(this.btnModifyProp);
             this.Controls.Add(this.tbConsole);
             this.Controls.Add(this.btnLaunch);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ServerLauncher";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
@@ -377,5 +389,6 @@
         private System.Windows.Forms.ImageList iml0;
         private System.Windows.Forms.OpenFileDialog ofdServerIcon;
         private System.Windows.Forms.Button btnServerIcon;
+        private System.Windows.Forms.Label label1;
     }
 }

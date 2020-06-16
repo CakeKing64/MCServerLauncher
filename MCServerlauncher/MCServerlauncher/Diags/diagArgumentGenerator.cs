@@ -109,7 +109,7 @@ namespace MCServerLauncher.Diags
 
         private void diagArgumentGenerator_Load(object sender, EventArgs e)
         {
-            chkX64.Enabled = Program.iJavaType == 64 ? true : false;
+            chkX64.Enabled = Program.bForceEnable64Bit || ( Program.iJavaType == 64 ? true : false);
             load_args(_args);
         }
 

@@ -62,6 +62,8 @@ namespace MCServerLauncher.Diags
         {
             if (FAIL_CHECK)
                 return;
+            if (listBox1.SelectedIndex == -1)
+                SelectedVersion = "yes";
             SelectedVersion = listBox1.SelectedItem.ToString();
             this.Close();
         }

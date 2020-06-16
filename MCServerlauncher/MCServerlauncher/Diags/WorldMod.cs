@@ -138,8 +138,8 @@ namespace MCServerLauncher
             {
                 var ds = fileList[0].Split('\\');
                 Directory.Move(fileList[0], svdir + "/" + ds[ds.Length - 1]);
-                    Refresh();
-            }
+                    RefreshWorlds();
+                }
         }
 
         private void WorldMod_DragEnter(object sender, DragEventArgs e)
