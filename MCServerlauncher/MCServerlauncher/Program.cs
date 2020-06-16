@@ -219,7 +219,9 @@ namespace MCServerLauncher
 
 
             // Java check
-            if(!Directory.Exists(sJavaPath) || !File.Exists(sJavaPath + "java.exe"))
+            if (bForceJavaPath)
+                goto _java_check_end;
+            if (!Directory.Exists(sJavaPath) || !File.Exists(sJavaPath + "java.exe"))
             {
                 sJavaPath = null;
             }
@@ -311,39 +313,41 @@ namespace MCServerLauncher
                         sJavaPath = jpath + "\\";
                     }
                 }
-            _java_check_end:
 
-                var f = File.Open(sJavaPath + "\\java.exe", FileMode.Open, FileAccess.Read);
+                SaveSettings();
+            }
 
-                // 64 / 32 bit check
-                byte[] buffer = new byte[2];
-                while (true)
-                { 
-                
+        _java_check_end:
+
+            var f = File.Open(sJavaPath + "\\java.exe", FileMode.Open, FileAccess.Read);
+
+            // 64 / 32 bit check
+            byte[] buffer = new byte[2];
+            while (true)
+            {
+
 
                 f.Read(buffer, 0, 2);
 
-                    if (buffer[0] == 'P' && buffer[1] == 'E')
-                        break;
+                if (buffer[0] == 'P' && buffer[1] == 'E')
+                    break;
 
-                    if (f.Position + 2 >= f.Length)
-                        break;
+                if (f.Position + 2 >= f.Length)
+                    break;
 
-                 f.Seek(2, SeekOrigin.Current);
-
-                    
-                }
                 f.Seek(2, SeekOrigin.Current);
-                f.Read(buffer,0,2);
-                if (buffer[0] == 100 && buffer[1] == 134)
-                    iJavaType = 64;
-                else if (buffer[0] == 0x4c && buffer[1] == 1)
-                    iJavaType = 32;
-                else
-                    iJavaType = 16; // Invalid java probably
-                f.Close();
-                SaveSettings();
+
+
             }
+            f.Seek(2, SeekOrigin.Current);
+            f.Read(buffer, 0, 2);
+            if (buffer[0] == 100 && buffer[1] == 134)
+                iJavaType = 64;
+            else if (buffer[0] == 0x4c && buffer[1] == 1)
+                iJavaType = 32;
+            else
+                iJavaType = 16; // Invalid java probably
+            f.Close();
 
             Console.Clear();
 
