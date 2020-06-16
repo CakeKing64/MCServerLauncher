@@ -15,13 +15,24 @@ namespace MCServerLauncher
     {
         static bool Modify = false;
         static string sPropDir = "";
+        static string sPropFile = null;
         ServerProperties sprop = null;
         static Font fnt_regular = new Font(new FontFamily("Consolas"), 8, FontStyle.Regular);
         static Font fnt_bold = new Font(new FontFamily("Consolas"), 8, FontStyle.Bold);
+
+        public static bool bShowAllSettings = false;
+
         public PropertiesEditor(string dir)
         {
             InitializeComponent();
             sPropDir = dir;
+        }
+
+        public PropertiesEditor(string dir, string propfname)
+        {
+            InitializeComponent();
+            sPropDir = dir;
+            sPropFile = propfname;
         }
         List<TextBox> keys = new List<TextBox>();
         List<Object> values = new List<Object>();
@@ -30,13 +41,18 @@ namespace MCServerLauncher
 
         private void PropertiesEditor_Load(object sender, EventArgs e)
         {
-            sprop = ServerProperties.FromFile(sPropDir + "/server.properties");
+            if (sPropFile == null)
+                sprop = ServerProperties.FromFile(sPropDir + "/server.properties");
+            else
+                sprop = ServerProperties.FromFile(sPropFile);
             int y = 0;
             Font fnt = new Font("Consolas", 8); 
             foreach (KeyValuePair<string,SPropSetting> KVP in sprop.ServerVars)
             {
-                if (KVP.Value.value != null)
+                if (KVP.Value.value != null && !bShowAllSettings)
                 {
+                    var kvp_value = KVP.Value.value != null ? KVP.Value.value : bShowAllSettings ? "" : null;
+
                     var tbNewBox = new TextBox();
                     tbNewBox.Text = KVP.Key;
                     tbNewBox.Location = new Point(0, y);
@@ -52,7 +68,7 @@ namespace MCServerLauncher
                         case 0: // String
                         case 1: // Int
                             var tbNewBox2 = new TextBox();
-                            tbNewBox2.Text = KVP.Value.value;
+                            tbNewBox2.Text = kvp_value;
                             tbNewBox2.Location = new Point(200, y);
                             tbNewBox2.BackColor = SystemColors.ActiveCaption;
                             tbNewBox2.Size = new Size(200, 20);
@@ -64,7 +80,9 @@ namespace MCServerLauncher
                             break;
                         case 2:
                             var chkNewCheck = new CheckBox();
-                            chkNewCheck.Checked = bool.Parse(KVP.Value.value);
+                            bool check = false;
+                            bool cs = bool.TryParse(KVP.Value.value, out check);
+                            chkNewCheck.Checked = cs ? check : false;
                             chkNewCheck.Location = new Point(200, y);
                             chkNewCheck.Size = new Size(200, 20);
                             chkNewCheck.CheckedChanged += ItemChanged;
@@ -105,7 +123,7 @@ namespace MCServerLauncher
                 p++;
             }
 
-            File.WriteAllText(sPropDir + "/server.properties", sprop.ToString());
+            File.WriteAllText(sPropFile == null ? sPropDir + "/server.properties" : sPropFile, sprop.ToString());
         }
         bool prevent_close()
         {

@@ -2,10 +2,8 @@
 
 Allows for an easy way to create Vanilla and Spigot servers
 
-Supports some arguments (use -help / -? to take a look)
+Supports arguments [argument wiki page lol](https://youtu.be/STl3eifhkm4?t=10)
 
-Cool things:
-When downloading a server you can use "latest" to download the latest version of a server (release, not snapshot)
-
+[How to setup a server](https://github.com/CakeKing64/MCServerLauncher/wiki/Starting-a-server) (Requires Java) [Get Java](https://java.com/en/download/manual.jsp)
 
 yeah, I really didn't plan this out much.
